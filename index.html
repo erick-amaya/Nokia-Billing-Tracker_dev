@@ -14,7 +14,7 @@
 <link rel="icon" type="image/png" sizes="512x512" href="icon-512x512.png">
 <link rel="manifest" href="manifest.json">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;900&family=Barlow:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://unpkg.com/xlsx-js-style@1.2.0/dist/xlsx-js-style.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
@@ -333,8 +333,9 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
 
 <div class="nav">
   <button class="nt active" onclick="showScreen('dashboard',this)">Dashboard</button>
-  <button class="nt" onclick="showScreen('sitios',this)">Sitios</button>
+  <button class="nt" onclick="showScreen('sitios',this)">TI</button>
   <button class="nt" onclick="showScreen('sitios-tss',this)">TSS</button>
+  <button class="nt" id="nav-cw" onclick="showScreen('consolidado-cw',this)">CW</button>
   <button class="nt" onclick="showScreen('liquidador',this)">Liquidador</button>
   <button class="nt" onclick="showScreen('gastos',this)">Gastos</button>
   <button class="nt" onclick="showScreen('reportes',this)">Reportes</button>
@@ -405,7 +406,7 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
 <!-- SITIOS / CONSOLIDATED -->
 <div id="screen-sitios" class="screen">
   <div class="fb mb14">
-    <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:700">Consolidado — Todos los Sitios</h1>
+    <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:700">Consolidado — Sitios TI</h1>
       <button class="btn bk btn-sm no-print" onclick="showScreen('dashboard',document.querySelector('.nt'))" style="font-size:10px">← Dashboard</button>
     <div class="flex gap8">
       <select class="fc" id="fil-lc-sitios" style="width:200px" onchange="renderConsolidado()">
@@ -655,6 +656,85 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
       </table>
     </div>
   </div>
+
+  <!-- CATÁLOGO CW -->
+  <div class="sec-div" style="display:flex;justify-content:space-between;align-items:center;margin-top:20px">
+    CATÁLOGO CW — Obra Civil (106 ítems)
+    <div class="flex gap8">
+      <select class="fc" id="cat-cw-zona" style="width:150px;font-size:10px" onchange="renderCatalogoCW()">
+        <option value="URBANO">Precios URBANO</option>
+        <option value="RURAL">Precios RURAL</option>
+      </select>
+    </div>
+  </div>
+  <div class="card"><div style="padding:0;overflow-x:auto">
+    <table class="tbl" id="tbl-cat-cw">
+      <thead><tr>
+        <th style="min-width:40px">Ítem</th>
+        <th style="min-width:280px">Descripción</th>
+        <th>Unidad</th>
+        <th class="num th-nokia" style="min-width:130px">P. Nokia</th>
+        <th class="num th-subc" style="min-width:130px">P. SubC</th>
+      </tr></thead>
+      <tbody id="tbody-cat-cw">
+        <tr><td colspan="5" style="padding:20px;text-align:center;color:var(--g3)">Cargando catálogo CW…</td></tr>
+      </tbody>
+    </table>
+  </div></div>
+</div>
+
+
+<!-- CONSOLIDADO CW -->
+<div id="screen-consolidado-cw" class="screen">
+  <div class="fb mb14">
+    <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:700">Consolidado — Obra Civil (CW)</h1>
+    <button class="btn bk btn-sm no-print" onclick="showScreen('dashboard',document.querySelector('.nt'))" style="font-size:10px">← Dashboard</button>
+    <div class="flex gap8">
+      <select class="fc" id="fil-lc-cw" style="width:200px" onchange="renderConsolidadoCW()">
+        <option value="">Todas las Cuadrillas (LC)</option>
+      </select>
+      <button class="btn bk btn-sm no-print" onclick="exportarExcelCW()">⬇ Excel CW</button>
+    </div>
+  </div>
+  <div class="g3 mb14" id="cw-stats"></div>
+  <div class="card">
+    <div style="padding:0;overflow-x:auto;max-height:calc(100vh - 260px);overflow-y:auto">
+      <table class="tbl" id="tbl-cw-cons">
+        <thead style="position:sticky;top:0;z-index:2">
+          <tr>
+            <th>Sitio TI</th><th>SMP</th><th>Región</th>
+            <th>Tipo</th><th>LC</th><th>Estado</th>
+            <th class="num th-nokia">Venta Nokia CW</th>
+            <th class="num th-subc">Costo SubC CW</th>
+            <th class="num">Utilidad</th><th class="num">% Margen</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody-cw-cons"></tbody>
+        <tfoot id="tfoot-cw-cons" style="position:sticky;bottom:0;z-index:2"></tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- LIQUIDADOR CW -->
+<div id="screen-liquidador-cw" class="screen">
+  <div class="fb mb14">
+    <button class="btn bk btn-sm no-print" onclick="showScreen('consolidado-cw',document.getElementById('nav-cw'))" style="font-size:10px">← Consolidado CW</button>
+    <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:700">
+      Liquidador CW: <span id="liq-cw-tit" style="color:var(--g)">Selecciona un sitio</span>
+    </h1>
+    <div class="flex gap8">
+      <select class="fc" id="sel-liq-cw" onchange="cargarLiqCW(this.value)" style="width:220px"></select>
+      <button class="btn bk btn-sm no-print" onclick="exportarExcelCWSitio()">⬇ Excel CW</button>
+    </div>
+  </div>
+  <div id="liq-cw-content">
+    <div style="text-align:center;padding:50px;color:var(--g3)">
+      <div style="font-size:40px;margin-bottom:10px">🏗</div>
+      <div style="font-weight:600;color:var(--g4)">Selecciona un sitio TI para abrir el Liquidador CW</div>
+    </div>
+  </div>
 </div>
 
 </div><!-- /main -->
@@ -738,6 +818,45 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
     <div class="mf">
       <button class="btn bou" onclick="closeModal('m-gastos')">Cancelar</button>
       <button class="btn bd" onclick="agregarGasto()">✓ Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- AGREGAR ÍTEM CW -->
+<div class="mo" id="m-add-cw-item">
+  <div class="modal" style="max-width:520px">
+    <div class="mh" style="background:#0f4c75;border-bottom-color:#48cae4">
+      <h3 style="color:#fff">＋ Agregar Ítem CW</h3>
+      <button class="mc" onclick="closeModal('m-add-cw-item')">×</button>
+    </div>
+    <div class="mb">
+      <div class="fg">
+        <label class="fl">Ítem / Actividad CW</label>
+        <select class="fc" id="cw-add-act" style="font-size:11px"></select>
+      </div>
+      <div class="fg" id="cw-add-preview" style="background:#f0f9ff;border-radius:6px;padding:10px;font-size:11px;display:none">
+        <div id="cw-add-preview-txt"></div>
+      </div>
+      <div class="fg">
+        <label class="fl">Cantidad</label>
+        <input type="number" class="fc" id="cw-add-cant" value="1" min="0" step="any">
+      </div>
+    </div>
+    <div class="mf">
+      <button class="btn bou" onclick="closeModal('m-add-cw-item')">Cancelar</button>
+      <button class="btn bp" style="background:#0f4c75" onclick="confirmarAddCWItem()">＋ Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL CONFIRMACIÓN GENÉRICO -->
+<div class="mo" id="m-confirm">
+  <div class="modal" style="max-width:420px">
+    <div class="mh"><h3 id="m-confirm-title">Confirmar</h3></div>
+    <div class="mb"><p id="m-confirm-msg" style="margin:0;font-size:14px;line-height:1.5"></p></div>
+    <div class="mf">
+      <button class="btn bou" id="m-confirm-no" onclick="closeModal('m-confirm')">No</button>
+      <button class="btn bp" id="m-confirm-si" onclick="closeModal('m-confirm')">Sí</button>
     </div>
   </div>
 </div>
@@ -1028,6 +1147,7 @@ let CAT={
 
 let _subcLoadedFromSupabase=false;
 let _catSyncInProgress=false;
+let CAT_CW=[];  // 106 ítems CW cargados desde Supabase catalogo_cw
 let SUBCS=[
   {lc:'ALVARO GONZALEZ',empresa:'ALVARO GONZALEZ',cat:'A',tel:'3165363197',email:'algo.65@hotmail.com',tipoCuadrilla:'TI Scytel'},
   {lc:'JOSE DORRONSORO',empresa:'JOSE DORRONSORO',cat:'A',tel:'3113782638',email:'Josedorronsorobuitrago@gmail.com',tipoCuadrilla:'TI Scytel'},
@@ -1051,8 +1171,8 @@ let SUBCS=[
 ];
 
 // Auth handled by Supabase
-const SUPA_URL = 'https://jizghfywuinxjrroyuuu.supabase.co';
-const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppemdoZnl3dWlueGpycm95dXV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwNjY1OTQsImV4cCI6MjA5MDY0MjU5NH0.8K_beo154InmyZ6nbXIm-HJXBt0CX7rjw4HNHxgbwII';
+const SUPA_URL = 'https://ifmtkoguxbugvbhlvtwc.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlmbXRrb2d1eGJ1Z3ZiaGx2dHdjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQxMjQ3MjEsImV4cCI6MjA4OTcwMDcyMX0.BS_u-8cv1j_2FrE-H95R8zWxyvzKHKhLlhqmSle7RrA';
 let _supaClient = null;
 function getSupabase(){
   if(!_supaClient && window.supabase)
@@ -1062,6 +1182,7 @@ function getSupabase(){
 const USE_SUPABASE = true;
 let ST={
   user:'',role:'',isAdmin:false,isViewer:false,
+  liquidaciones_cw:[],
   sitios:[{"id":"CAL.Vallegrande-2","nombre":"CAL.Vallegrande-2","tipo":"TI","fecha":"2026-01-01","ciudad":"Ciudad_Principal","lc":"JOHAN VELOZA","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":5.0,"unidad":"Unidad"},{"id":"IMP_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":5.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":2.0,"unidad":"Unidad"},{"id":"IMP_RF","sec":"5G","tipo":"BASE","cant":3.0,"unidad":"Unidad"},{"id":"IMP_Rectificador","sec":"ADJ","tipo":"ADJ","cant":1.0,"unidad":"Sitio"}]},{"id":"CAU.Santa Leticia","nombre":"CAU.Santa Leticia","tipo":"TI","fecha":"2026-01-23","ciudad":"Dificil Acceso","lc":"ALVARO GONZALEZ","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":4.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":3.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"},{"id":"Logistica_Inversa_Antenas","sec":"ADJ","tipo":"ADJ","cant":1.0,"unidad":"Unidad"}]},{"id":"FLO.Ciudadela-2","nombre":"FLO.Ciudadela-2","tipo":"TI","fecha":"2026-02-01","ciudad":"Ciudad_Principal","lc":"MOISES LADINO","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":8.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"},{"id":"Logistica_Inversa_Antenas","sec":"ADJ","tipo":"ADJ","cant":2.0,"unidad":"Unidad"}]},{"id":"FLO.Berlin","nombre":"FLO.Berlin","tipo":"TI","fecha":"2026-02-03","ciudad":"Ciudad_Intermedia","lc":"ALVARO GONZALEZ","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"},{"id":"REUB_RF_Airscale_AHPCx","sec":"ADJ","tipo":"ADJ","cant":3.0,"unidad":"Unidad"}]},{"id":"NAR.Leiva-2","nombre":"NAR.Leiva-2","tipo":"TI","fecha":"2026-02-07","ciudad":"Ciudad_Intermedia","lc":"JECSON ANDRES FESTES","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":4.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":3.0,"unidad":"Unidad"},{"id":"Logistica_Inversa_Antenas","sec":"ADJ","tipo":"ADJ","cant":2.0,"unidad":"Unidad"}]},{"id":"TOL.El Vergel","nombre":"TOL.El Vergel","tipo":"TI","fecha":"2026-02-09","ciudad":"Dificil Acceso","lc":"JOHAN VELOZA","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":4.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":3.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"},{"id":"Logistica_Inversa_Antenas","sec":"ADJ","tipo":"ADJ","cant":1.0,"unidad":"Unidad"}]},{"id":"FLO.Bocana-2","nombre":"FLO.Bocana-2","tipo":"TI","fecha":"2026-02-09","ciudad":"Ciudad_Intermedia","lc":"MOISES LADINO","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":7.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"Logistica_Inversa_Antenas","sec":"ADJ","tipo":"ADJ","cant":3.0,"unidad":"Unidad"},{"id":"REUB_RF_Airscale_AHPCx","sec":"ADJ","tipo":"ADJ","cant":2.0,"unidad":"Unidad"}]},{"id":"FLO.Villa Monica","nombre":"FLO.Villa Monica","tipo":"TI","fecha":"2026-02-09","ciudad":"Ciudad_Intermedia","lc":"ALVARO GONZALEZ","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"}]},{"id":"VAL.Yumbo-2","nombre":"VAL.Yumbo-2","tipo":"TI","fecha":"2026-01-01","ciudad":"Ciudad_Principal","lc":"JHON ALVARO MUÑOZ","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":8.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":8.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"},{"id":"REUB_RF_Airscale_AHPCx","sec":"ADJ","tipo":"ADJ","cant":2.0,"unidad":"Unidad"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":8.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":8.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"},{"id":"REUB_RF_Airscale_AHPCx","sec":"ADJ","tipo":"ADJ","cant":2.0,"unidad":"Unidad"}]},{"id":"POP.La Esmeralda","nombre":"POP.La Esmeralda","tipo":"TI","fecha":"2026-02-16","ciudad":"Ciudad_Secundaria","lc":"JECSON  FESTES","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":9.0,"unidad":"Unidad"}]},{"id":"CAD.Guarinocito","nombre":"CAD.Guarinocito","tipo":"TI","fecha":"2026-02-19","ciudad":"Dificil Acceso","lc":"Baldomiro Benavides (Esp)","cat":"AA","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":5.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"}]},{"id":"CAQ.Getucha","nombre":"CAQ.Getucha","tipo":"TI","fecha":"2026-02-19","ciudad":"Dificil Acceso","lc":"ALVARO GONZALEZ","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":9.0,"unidad":"Unidad"},{"id":"IMP_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":4.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":3.0,"unidad":"Unidad"},{"id":"REUB_RF_Airscale_AHPCx","sec":"ADJ","tipo":"ADJ","cant":2.0,"unidad":"Unidad"}]},{"id":"TOL.Chaparral","nombre":"TOL.Chaparral","tipo":"TI","fecha":"2026-02-23","ciudad":"Ciudad_Intermedia","lc":"JOHAN VELOZA","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":5.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"},{"id":"REUB_RF_Airscale_AHPCx","sec":"ADJ","tipo":"ADJ","cant":2.0,"unidad":"Unidad"}]},{"id":"TOL.Mariquita","nombre":"TOL.Mariquita","tipo":"TI","fecha":"2026-02-24","ciudad":"Ciudad_Intermedia","lc":"JECSON  FESTES","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":4.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":5.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":2.0,"unidad":"Unidad"},{"id":"REUB_RF_Airscale_AHPCx","sec":"ADJ","tipo":"ADJ","cant":3.0,"unidad":"Unidad"}]},{"id":"CAL.Compartir","nombre":"CAL.Compartir","tipo":"TI","fecha":"2026-03-01","ciudad":"Ciudad_Principal","lc":"MOISES LADINO","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":8.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":7.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"},{"id":"REUB_RF_Airscale_AHPCx","sec":"ADJ","tipo":"ADJ","cant":3.0,"unidad":"Unidad"}]},{"id":"CAQ.Doncello","nombre":"CAQ.Doncello","tipo":"TI","fecha":"2026-03-06","ciudad":"Dificil Acceso","lc":"ALVARO GONZALEZ","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"IMP_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":3.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":2.0,"unidad":"Unidad"}]},{"id":"NAR.Tumaco-2","nombre":"NAR.Tumaco-2","tipo":"TI","fecha":"2026-03-09","ciudad":"Ciudad_Intermedia","lc":"BALDOMIRO BENAVIDES","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":7.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":10.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":3.0,"unidad":"Unidad"},{"id":"REUB_RF_Airscale_AHPCx","sec":"ADJ","tipo":"ADJ","cant":2.0,"unidad":"Unidad"}]},{"id":"HUI.Palestina-2","nombre":"HUI.Palestina-2","tipo":"TI","fecha":"2026-03-09","ciudad":"Ciudad_Intermedia","lc":"JECSON  FESTES","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":4.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":2.0,"unidad":"Unidad"},{"id":"Logistica_Inversa_Antenas","sec":"ADJ","tipo":"ADJ","cant":1.0,"unidad":"Unidad"}]},{"id":"ANT.Pueblo Nuevo","nombre":"ANT.Pueblo Nuevo","tipo":"TI","fecha":"2026-03-14","ciudad":"Ciudad_Intermedia","lc":"JOSE DORRONSORO","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":5.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Unidad"},{"id":"Logistica_Inversa_Antenas","sec":"ADJ","tipo":"ADJ","cant":6.0,"unidad":"Unidad"},{"id":"REUB_RF_Airscale_AHPCx","sec":"ADJ","tipo":"ADJ","cant":1.0,"unidad":"Unidad"}]},{"id":"CAL.Prados del Sur","nombre":"CAL.Prados del Sur","tipo":"TI","fecha":"2026-03-14","ciudad":"Ciudad_Principal","lc":"MOISES LADINO","cat":"A","tiene_cw":false,"cw_nokia":0,"cw_costo":0,"costos":{"backoffice":0},"actividades":[{"id":"PM","sec":"MODERNIZACION","tipo":"BASE","cant":1.0,"unidad":"Sitio"},{"id":"IMP_RF","sec":"MODERNIZACION","tipo":"BASE","cant":6.0,"unidad":"Unidad"},{"id":"DESMONTE_RF","sec":"MODERNIZACION","tipo":"BASE","cant":7.0,"unidad":"Unidad"},{"id":"DESMONTE_BB","sec":"MODERNIZACION","tipo":"BASE","cant":2.0,"unidad":"Unidad"},{"id":"Logistica_Inversa_Antenas","sec":"ADJ","tipo":"ADJ","cant":3.0,"unidad":"Unidad"},{"id":"REUB_RF_Airscale_AHPCx","sec":"ADJ","tipo":"ADJ","cant":3.0,"unidad":"Unidad"}]}],
   gastos:[]
 };
@@ -1094,6 +1215,19 @@ function matchTipoCuadrilla(s, filTC){
 const mfcls=v=>v>=.3?'':v>=.2?'warn':'dang';
 function toast(m,t='ok'){const el=document.getElementById('toast');el.textContent=m;el.style.borderLeftColor=t==='err'?'#c0392b':'#1a9c1a';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2800)}
 function openModal(id){document.getElementById(id).classList.add('open')}
+// Modal de confirmación con botones "Sí" / "No"
+function confirmDialog(title,msg,onSi,onNo){
+  document.getElementById('m-confirm-title').textContent=title;
+  document.getElementById('m-confirm-msg').textContent=msg;
+  const btnSi=document.getElementById('m-confirm-si');
+  const btnNo=document.getElementById('m-confirm-no');
+  const newSi=btnSi.cloneNode(true);const newNo=btnNo.cloneNode(true);
+  btnSi.parentNode.replaceChild(newSi,btnSi);
+  btnNo.parentNode.replaceChild(newNo,btnNo);
+  newSi.onclick=()=>{closeModal('m-confirm');if(onSi)onSi();};
+  newNo.onclick=()=>{closeModal('m-confirm');if(onNo)onNo();};
+  openModal('m-confirm');
+}
 function closeModal(id){document.getElementById(id).classList.remove('open')}
 document.querySelectorAll('.mo').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
 
@@ -1107,6 +1241,8 @@ function showScreen(name,btn){
   if(name==='dashboard')renderDashboard();
   else if(name==='sitios')renderConsolidado();
   else if(name==='sitios-tss')renderConsolidadoTSS();
+  else if(name==='consolidado-cw')renderConsolidadoCW();
+  else if(name==='liquidador-cw')initSelLiqCW();
   else if(name==='gastos')renderGastos();
   else if(name==='catalogo')renderCatalogo();
   else if(name==='config')renderConfigEmpresa();
@@ -1550,36 +1686,60 @@ function renderLiqSitio(sitio){
   const addBtn=sitio.estado==='final'?'':`<button class="btn btn-sm no-print" style="background:#CDFBF2;color:#000000;font-weight:700" onclick="openAddAct('${sitio.id}')">＋ Actividad</button>`;
   const addBtnSubc=sitio.estado==='final'?'':`<button class="btn btn-sm no-print" style="background:#FFC000;color:#000000;font-weight:700" onclick="openAddAct('${sitio.id}')">＋ Actividad</button>`;
 
-  // CW row
-  const cwLabel=sitio.cw_conjunto?'CW en Conjunto':sitio.tiene_cw?'Incluye CW':'Sin CW';
+  // CW card — auto-llena desde liquidación CW
+  const _liqCW=getLiqCW(sitio.id);
+  const _calcCW=_liqCW?calcLiqCW(_liqCW):null;
+  // Sync totals from CW liquidation to sitio fields
+  if(_calcCW&&sitio.tiene_cw&&!sitio.cw_conjunto){
+    sitio.cw_nokia=Math.round(_calcCW.totNokia);
+    sitio.cw_costo=Math.round(_calcCW.totSubc);
+  }
+  const _cwMode=sitio.cw_conjunto?'conjunto':sitio.tiene_cw?'individual':'no';
   const cwBlock=`
     <div class="card">
-      <div class="card-h" style="background:#144E4A;border-left-color:#CDFBF2"><h2 style="color:#CDFBF2">CW — Obra Civil</h2>
-        <span class="badge" style="background:#144E4A;color:#CDFBF2;border-radius:20px;padding:3px 10px;font-size:10px;font-weight:700">${cwLabel}</span>
+      <div class="card-h" style="background:#144E4A;border-left-color:#CDFBF2">
+        <h2 style="color:#CDFBF2">CW — Obra Civil</h2>
+        <select class="fc" style="width:auto;padding:3px 8px;font-size:11px;background:#1a6b5e;color:#CDFBF2;border-color:#CDFBF244;font-weight:700"
+          ${sitio.estado==='final'?'disabled':''} onchange="activarCW('${sitio.id}',this.value)">
+          <option value="no"      ${_cwMode==='no'      ?'selected':''}>Sin CW</option>
+          <option value="individual" ${_cwMode==='individual'?'selected':''}>CW Individual</option>
+          <option value="conjunto"   ${_cwMode==='conjunto'  ?'selected':''}>CW en Conjunto</option>
+        </select>
       </div>
       <div class="card-b">
-        ${sitio.tiene_cw?`<div class="g2">
-          <div class="fg mb0"><label class="fl" style="color:var(--b)">Valor CW Nokia (venta)</label>
-            <input class="fc" type="text" value="${copInput(sitio.cw_nokia||0)}"
+      ${_cwMode==='individual'?`
+        <div class="g2">
+          <div class="fg mb0">
+            <label class="fl" style="color:var(--b)">Venta Nokia CW
+              ${_calcCW&&_calcCW.totNokia>0?'<span style="color:var(--g);font-size:9px"> ✓ desde liquidación</span>':''}
+            </label>
+            <input class="fc" type="text" id="cw-nokia-inp-${sitio.id}"
+              value="${copInput(sitio.cw_nokia||0)}"
+              style="border-color:#1a5276;font-weight:700"
               oninput="this.value=this.value.replace(/[^0-9]/g,'')"
               onchange="updSitio('${sitio.id}','cw_nokia',parseInt(this.value.replace(/[^0-9]/g,''))||0)">
           </div>
-          <div class="fg mb0"><label class="fl" style="color:#78350f">Costo CW SubContratista</label>
-            <input class="fc" type="text" value="${copInput(sitio.cw_costo||0)}"
+          <div class="fg mb0">
+            <label class="fl" style="color:#78350f">Costo SubC CW
+              ${_calcCW&&_calcCW.totSubc>0?'<span style="color:var(--g);font-size:9px"> ✓ desde liquidación</span>':''}
+            </label>
+            <input class="fc" type="text" id="cw-subc-inp-${sitio.id}"
+              value="${copInput(sitio.cw_costo||0)}"
+              style="border-color:#b45309;font-weight:700"
               oninput="this.value=this.value.replace(/[^0-9]/g,'')"
               onchange="updSitio('${sitio.id}','cw_costo',parseInt(this.value.replace(/[^0-9]/g,''))||0)">
           </div>
         </div>
-        <div style="margin-top:10px;display:flex;gap:8px">
-          <button class="btn btn-sm no-print" style="background:#144E4A;color:#CDFBF2;font-weight:700" onclick="activarCW('${sitio.id}','individual')">＋ Cambiar a CW</button>
-          <button class="btn btn-sm no-print" style="background:#144E4A;color:#CDFBF2;font-weight:700" onclick="activarCW('${sitio.id}','conjunto')">Cambiar a CW en Conjunto</button>
-          <button class="btn btn-sm no-print" style="background:#C00000;color:#FFFFFF;font-weight:700" onclick="activarCW('${sitio.id}','no')">✕ Quitar CW</button>
+        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+          <button class="btn btn-sm no-print" style="background:#0f4c75;color:#fff;font-weight:700"
+            onclick="abrirLiquidadorCW('${sitio.id}')">📋 Liquidador CW</button>
+          ${_liqCW?`<span style="font-size:10px;color:var(--g4)">${_liqCW.items.length} ítems · ${_liqCW.tipo_zona} · ${_liqCW.estado==='final'?'<span style=\'color:var(--g);font-weight:700\'>FINAL</span>':'PRE'}</span>`:'<span style="font-size:10px;color:var(--g3)">Sin liquidación CW aún</span>'}
         </div>`
-        :`<div class="alert al-i mb0" style="margin-bottom:10px">Este sitio no incluye obra civil.</div>
-        <div style="display:flex;gap:8px">
-          <button class="btn btn-sm no-print" style="background:#144E4A;color:#CDFBF2;font-weight:700" onclick="activarCW('${sitio.id}','individual')">＋ Activar CW</button>
-          <button class="btn btn-sm no-print" style="background:#144E4A;color:#CDFBF2;font-weight:700" onclick="activarCW('${sitio.id}','conjunto')">Activar CW en Conjunto</button>
-        </div>`}
+      :_cwMode==='conjunto'?`
+        <div class="alert al-i mb0" style="margin-bottom:0">
+          CW en Conjunto.
+        </div>`
+      :`<div class="alert al-i mb0" style="margin-bottom:0">Sin Obra Civil en este sitio.</div>`}
       </div>
     </div>`;
 
@@ -2120,10 +2280,13 @@ function loadState(){
   try{
     const d=JSON.parse(localStorage.getItem('igt26')||'{}');
     if(d.sitios&&d.sitios.length>=_DEFAULT_SITIOS_COUNT){
-      // Reset all loaded sites to 'pre' so user marks them final manually
-      ST.sitios=d.sitios; // respect saved estado
+      ST.sitios=d.sitios;
       if(d.gastos)ST.gastos=d.gastos;
     } else if(d.gastos&&d.gastos.length){ST.gastos=d.gastos;}
+  }catch(e){}
+  try{
+    const cwLocal=JSON.parse(localStorage.getItem('igt26_cw')||'[]');
+    if(cwLocal.length)ST.liquidaciones_cw=cwLocal;
   }catch(e){}
 }
 
@@ -2137,6 +2300,12 @@ async function loadFromSupabase(){
       .from('sitios').select('*').order('created_at',{ascending:true});
     if(eS||!sitiosData||sitiosData.length===0) return false;
     const {data:gastosData}=await supa.from('gastos').select('*');
+    const {data:liqCWData}=await supa.from('liquidaciones_cw').select('*');
+    if(liqCWData) ST.liquidaciones_cw=liqCWData.map(r=>({
+      id:r.id,sitio_id:r.sitio_id,smp:r.smp||'',region:r.region||'',
+      tipo_zona:r.tipo_zona||'URBANO',lc:r.lc||'',estado:r.estado||'pre',
+      items:r.items||[]
+    }));
     ST.sitios=sitiosData.map(row=>({
       id:row.id, nombre:row.nombre, tipo:row.tipo,
       fecha:row.fecha, ciudad:row.ciudad, lc:row.lc||'',
@@ -2181,6 +2350,15 @@ async function syncToSupabase(){
         sitio_id:g.sitio, tipo:g.tipo||'', descripcion:g.desc||'', valor:g.valor||0
       }));
       await supa.from('gastos').insert(gastosData);
+    }
+    // Sync CW liquidations
+    if(ST.liquidaciones_cw.length>0){
+      const liqCWData=ST.liquidaciones_cw.map(l=>({
+        id:l.id, sitio_id:l.sitio_id, smp:l.smp||'', region:l.region||'',
+        tipo_zona:l.tipo_zona||'URBANO', lc:l.lc||'',
+        estado:l.estado||'pre', items:l.items||[]
+      }));
+      await supa.from('liquidaciones_cw').upsert(liqCWData,{onConflict:'id'});
     }
     toast('✓ Guardado en Supabase ('+ST.sitios.length+' sitios)');
   }catch(e){console.warn('Supabase sync failed:',e);}
@@ -2395,6 +2573,12 @@ async function syncInit(){
     await loadCatalogoFromSupabase();
     const loaded = await loadFromSupabase();
     if(loaded){ renderDashboard(); initSelLiq(); refreshSelects(); }
+    else if(ST.sitios.length>0){
+      // Supabase vacío pero hay datos en localStorage — bootstrapear
+      console.log('Supabase sitios vacío, sincronizando desde localStorage…');
+      toast('⚠ Supabase vacío — publicando datos locales…');
+      syncToSupabase();
+    }
     initRealtime();
   }
 }
@@ -2427,24 +2611,44 @@ function crearSitio(){
   toast(`Sitio ${nom} creado`);
   abrirLiquidador(nom);
 }
-async function eliminarSitio(id){
-  if(!confirm(`¿Eliminar ${id}?`))return;
-  ST.sitios=ST.sitios.filter(s=>s.id!==id);
-  ST.gastos=ST.gastos.filter(g=>g.sitio!==id);
-  saveState();
-  if(USE_SUPABASE){
-    const supa=getSupabase();
-    if(supa){
-      // Check session first
-      const {data:sess}=await supa.auth.getSession();
-      console.log('Session al eliminar:',sess?.session?.user?.email||'SIN SESION');
-      const {data,error,status}=await supa.from('sitios').delete().eq('id',id);
-      console.log('DELETE status:',status,'error:',error?.message||'ninguno');
-      if(error) toast('Error al eliminar: '+error.message,'err');
-      else console.log('Sitio eliminado de Supabase:',id);
+function eliminarSitio(id){
+  confirmDialog('Eliminar Sitio',`¿Eliminar el sitio ${id}?`,()=>{
+    const tieneLiqCW=ST.liquidaciones_cw.some(l=>l.sitio_id===id);
+    const doEliminar=(eliminarCW)=>{
+      ST.sitios=ST.sitios.filter(s=>s.id!==id);
+      ST.gastos=ST.gastos.filter(g=>g.sitio!==id);
+      saveState();
+      if(eliminarCW){
+        ST.liquidaciones_cw=ST.liquidaciones_cw.filter(l=>l.sitio_id!==id);
+        try{localStorage.setItem('igt26_cw',JSON.stringify(ST.liquidaciones_cw));}catch(e){}
+      }
+      (async()=>{
+        if(USE_SUPABASE){
+          const supa=getSupabase();
+          if(supa){
+            const {data:sess}=await supa.auth.getSession();
+            console.log('Session al eliminar:',sess?.session?.user?.email||'SIN SESION');
+            if(eliminarCW||!tieneLiqCW){
+              await supa.from('liquidaciones_cw').delete().eq('sitio_id',id);
+            }
+            const {error,status}=await supa.from('sitios').delete().eq('id',id);
+            console.log('DELETE sitio status:',status,'error:',error?.message||'ninguno');
+            if(error)toast('Error al eliminar sitio: '+error.message,'err');
+          }
+        }
+      })();
+      renderConsolidado();renderDashboard();
+      toast(`${id} eliminado${tieneLiqCW?(eliminarCW?' (con CW)':' — CW conservada'):''}`);
+    };
+    if(tieneLiqCW){
+      confirmDialog('Eliminar CW',`El sitio ${id} tiene una liquidación CW.\n¿Eliminar también la liquidación CW?`,
+        ()=>doEliminar(true),
+        ()=>doEliminar(false)
+      );
+    } else {
+      doEliminar(false);
     }
-  }
-  renderConsolidado();renderDashboard();toast(`${id} eliminado`);
+  });
 }
 
 // ============================================================
@@ -2943,6 +3147,21 @@ async function loadCatalogoFromSupabase(){
     }
     localStorage.setItem('igt26_cat',JSON.stringify({CAT,SUBCS}));
     refreshSelects();renderCatalogo();
+    // Load CW catalog (tabla: catalogo_cw, columnas: actividad_id, nombre, unidad,
+    //   precio_nokia_urbano, precio_nokia_rural, precio_subc_urbano, precio_subc_rural)
+    const {data:cwRows}=await supa.from('catalogo_cw').select('*').order('actividad_id');
+    if(cwRows&&cwRows.length>0){
+      CAT_CW=cwRows.map(r=>({
+        actividad_id:r.actividad_id||String(r.id),
+        nombre:r.nombre||r.actividad_id||'',
+        unidad:(r.unidad||'UN').trim(),
+        precio_nokia_urbano:r.precio_nokia_urbano||0,
+        precio_nokia_rural:r.precio_nokia_rural||0,
+        precio_subc_urbano:r.precio_subc_urbano||0,
+        precio_subc_rural:r.precio_subc_rural||0
+      }));
+      console.log('CAT_CW cargado: '+CAT_CW.length+' ítems');
+    }
   }catch(e){console.warn('loadCatalogo Supabase error:',e);}
 }
 
@@ -3086,6 +3305,7 @@ function renderCatalogo(){
     <td>${isAdmin?`<input class="fc" style="padding:2px 7px;font-size:11px" value="${s.email}" onchange="SUBCS[${i}].email=this.value;upsertSubc(${i})">`:`${s.email||'—'}`}</td>
     <td>${isAdmin?`<button class="btn-del" onclick="eliminarLC(${i})">✕</button>`:''}</td>
   </tr>`).join('');
+  renderCatalogoCW();
 }
 function updCatPrice(id,lista,col,zi,val){
   const lst=lista==='BASE'?CAT.BASE:lista==='ADJ'?CAT.ADJ:CAT.CR;
@@ -3125,50 +3345,770 @@ async function addSubcRow(){
 function addCatRow(lista){CAT[lista].push({id:'act_'+Date.now(),nombre:'Nueva Actividad',unidad:'Sitio',nokia:[0,0,0,0],A:[0,0,0,0],AA:[0,0,0,0],AAA:[0,0,0,0]});renderCatalogo();toast('Actividad agregada');}
 
 // ============================================================
-// EXPORTAR EXCEL
+// ============================================================
+// MÓDULO LIQUIDADOR CW
+// ============================================================
+// Construye array de items CW con precios según tipo_zona (URBANO / RURAL)
+function _cwItemsForTipo(catalog,tipo){
+  const esRural=tipo==='RURAL';
+  return catalog.map(c=>({
+    actividad_id:c.actividad_id,
+    nombre:c.nombre,
+    unidad:c.unidad,
+    cant:0,
+    precio_nokia:esRural?c.precio_nokia_rural:c.precio_nokia_urbano,
+    precio_subc:esRural?c.precio_subc_rural:c.precio_subc_urbano
+  }));
+}
+
+function _cwUuid(){
+  return 'cw-'+Date.now().toString(36)+'-'+Math.random().toString(36).substr(2,6);
+}
+function calcLiqCW(liq){
+  let totNokia=0,totSubc=0;
+  (liq.items||[]).forEach(item=>{
+    totNokia+=((item.cant||0)*(item.precio_nokia||0));
+    totSubc+=((item.cant||0)*(item.precio_subc||0));
+  });
+  const utilidad=totNokia-totSubc;
+  const margen=totNokia>0?utilidad/totNokia:0;
+  return{totNokia,totSubc,utilidad,margen};
+}
+
+function getLiqCW(sitioId){
+  return ST.liquidaciones_cw.find(l=>l.sitio_id===sitioId)||null;
+}
+
+function abrirLiquidadorCW(sitioId){
+  showScreen('liquidador-cw',document.getElementById('nav-cw'));
+  initSelLiqCW();
+  document.getElementById('sel-liq-cw').value=sitioId;
+  cargarLiqCW(sitioId);
+}
+
+function initSelLiqCW(){
+  const sel=document.getElementById('sel-liq-cw');
+  const cur=sel.value;
+  const tiSitios=ST.sitios.filter(s=>s.tipo==='TI');
+  sel.innerHTML='<option value="">— Seleccionar sitio TI —</option>'+
+    tiSitios.map(s=>`<option value="${s.id}">${s.id}</option>`).join('');
+  if(cur){sel.value=cur;cargarLiqCW(cur);}
+}
+
+function cargarLiqCW(sitioId){
+  const content=document.getElementById('liq-cw-content');
+  const tit=document.getElementById('liq-cw-tit');
+  if(!sitioId){
+    tit.textContent='Selecciona un sitio';
+    content.innerHTML='<div style="text-align:center;padding:50px;color:var(--g3)"><div style="font-size:40px;margin-bottom:10px">🏗</div><div style="font-weight:600;color:var(--g4)">Selecciona un sitio TI para abrir el Liquidador CW</div></div>';
+    return;
+  }
+  const sitio=ST.sitios.find(s=>s.id===sitioId);
+  if(!sitio){tit.textContent='Sitio no encontrado';return;}
+  tit.textContent=sitioId;
+  let liq=getLiqCW(sitioId);
+  if(!liq){
+    liq={id:sitioId,sitio_id:sitioId,smp:'',region:'',tipo_zona:'URBANO',lc:sitio.lc||'',estado:'pre',items:[]};
+    ST.liquidaciones_cw.push(liq);
+  }
+  renderLiquidadorCWSitio(sitio,liq);
+}
+
+function _updLiqCWTipoZona(sitioId,tipo){
+  const liq=getLiqCW(sitioId);if(!liq)return;
+  liq.tipo_zona=tipo;
+  // Actualizar precios en items ya agregados según nuevo tipo_zona
+  const esRural=tipo==='RURAL';
+  liq.items=liq.items.map(item=>{
+    const cat=CAT_CW.find(c=>c.actividad_id===item.actividad_id);
+    if(!cat) return item;
+    return{...item,
+      precio_nokia:esRural?cat.precio_nokia_rural:cat.precio_nokia_urbano,
+      precio_subc:esRural?cat.precio_subc_rural:cat.precio_subc_urbano
+    };
+  });
+  saveLiqCWLocal(liq);
+  const sitio=ST.sitios.find(s=>s.id===sitioId);
+  if(sitio)renderLiquidadorCWSitio(sitio,liq);
+}
+
+function _updLiqCWField(sitioId,field,val){
+  const liq=getLiqCW(sitioId);if(!liq)return;
+  liq[field]=val;
+  saveLiqCWLocal(liq);
+}
+
+function _updLiqCWCant(sitioId,actId,val){
+  const liq=getLiqCW(sitioId);if(!liq)return;
+  const item=liq.items.find(i=>i.actividad_id===actId);
+  if(item){item.cant=parseFloat(val)||0;}
+  saveLiqCWLocal(liq);
+  // Live update totals
+  const c=calcLiqCW(liq);
+  const mc=c.margen>=.3?'#1a7a1a':c.margen>=.2?'#FFC000':'#c0392b';
+  const tN=document.getElementById('cw-tot-nokia-'+sitioId);
+  const tS=document.getElementById('cw-tot-subc-'+sitioId);
+  const tU=document.getElementById('cw-ut-'+sitioId);
+  const tM=document.getElementById('cw-mg-'+sitioId);
+  if(tN)tN.textContent=cop(c.totNokia);
+  if(tS)tS.textContent=cop(c.totSubc);
+  if(tU){tU.textContent=cop(c.utilidad);tU.style.color=mc;}
+  if(tM){tM.textContent=pct(c.margen);tM.style.color=mc;}
+  // update row totals
+  const safeId=actId.replace(/[',]/g,'_');
+  const rN=document.getElementById('cw-rn-'+sitioId+'-'+safeId);
+  const rS=document.getElementById('cw-rs-'+sitioId+'-'+safeId);
+  if(item){
+    if(rN)rN.textContent=cop(item.cant*item.precio_nokia);
+    if(rS)rS.textContent=cop(item.cant*item.precio_subc);
+    const cantS=document.getElementById('cw-cant-s-'+sitioId+'-'+safeId);
+    if(cantS)cantS.textContent=item.cant;
+  }
+}
+
+function _marcarLiqCW(sitioId,estado){
+  const liq=getLiqCW(sitioId);if(!liq)return;
+  liq.estado=estado;
+  saveLiqCWLocal(liq);
+  saveLiqCWSupabase(liq);
+  const sitio=ST.sitios.find(s=>s.id===sitioId);
+  if(sitio)renderLiquidadorCWSitio(sitio,liq);
+  toast(estado==='final'?'✓ Liquidación CW marcada como FINAL':'↩ Liquidación CW reabierta');
+}
+
+function saveLiqCWLocal(liq){
+  const idx=ST.liquidaciones_cw.findIndex(l=>l.id===liq.id);
+  if(idx>=0)ST.liquidaciones_cw[idx]=liq;
+  // Auto-sync totals → sitio.cw_nokia / cw_costo
+  const sitio=ST.sitios.find(s=>s.id===liq.sitio_id);
+  if(sitio&&sitio.tiene_cw&&!sitio.cw_conjunto){
+    const cc=calcLiqCW(liq);
+    sitio.cw_nokia=Math.round(cc.totNokia);
+    sitio.cw_costo=Math.round(cc.totSubc);
+    // Update inputs in TI Liquidador if open
+    const inpN=document.getElementById('cw-nokia-inp-'+sitio.id);
+    const inpS=document.getElementById('cw-subc-inp-'+sitio.id);
+    if(inpN)inpN.value=copInput(sitio.cw_nokia);
+    if(inpS)inpS.value=copInput(sitio.cw_costo);
+  }
+  try{localStorage.setItem('igt26_cw',JSON.stringify(ST.liquidaciones_cw));}catch(e){}
+  clearTimeout(window._cwSyncTimer);
+  window._cwSyncTimer=setTimeout(()=>saveLiqCWSupabase(liq),2000);
+}
+
+async function saveLiqCWSupabase(liq){
+  if(!USE_SUPABASE)return;
+  const supa=getSupabase();if(!supa)return;
+  try{
+    await supa.from('liquidaciones_cw').upsert({
+      id:liq.id,sitio_id:liq.sitio_id,smp:liq.smp,region:liq.region,
+      tipo_zona:liq.tipo_zona,lc:liq.lc,estado:liq.estado,items:liq.items
+    },{onConflict:'id'});
+  }catch(e){console.warn('saveLiqCWSupabase error:',e);}
+}
+
+async function deleteLiqCW(liqId){
+  const liq=ST.liquidaciones_cw.find(l=>l.id===liqId);
+  if(!liq)return;
+  if(!confirm(`¿Eliminar liquidación CW de ${liq.sitio_id}?`))return;
+  ST.liquidaciones_cw=ST.liquidaciones_cw.filter(l=>l.id!==liqId);
+  try{localStorage.setItem('igt26_cw',JSON.stringify(ST.liquidaciones_cw));}catch(e){}
+  if(USE_SUPABASE){
+    const supa=getSupabase();
+    if(supa){
+      const {error}=await supa.from('liquidaciones_cw').delete().eq('id',liqId);
+      if(error)toast('Error al eliminar: '+error.message,'err');
+    }
+  }
+  renderConsolidadoCW();
+  toast('Liquidación CW eliminada');
+}
+
+function renderLiquidadorCWSitio(sitio,liq){
+  const c=calcLiqCW(liq);
+  const locked=liq.estado==='final';
+  const mc=c.margen>=.3?'#1a7a1a':c.margen>=.2?'#FFC000':'#c0392b';
+
+  const estadoBadge=liq.estado==='final'
+    ?'<span class="badge bg-g" style="font-size:11px;padding:4px 10px">✓ FINAL</span>'
+    :'<span class="badge bg-o" style="font-size:11px;padding:4px 10px">⏳ PRE-LIQUIDACIÓN</span>';
+  const estadoBtn=locked
+    ?(ST.isAdmin?`<button class="btn bou btn-sm no-print" style="font-size:9px;border-color:#c0392b;color:#c0392b" onclick="_marcarLiqCW('${sitio.id}','pre')">↩ Reabrir</button>`:'')
+    :`<button class="btn bp btn-sm no-print" onclick="_marcarLiqCW('${sitio.id}','final')">✓ Marcar Final</button>`;
+
+  const catWarn=CAT_CW.length===0?'<div class="alert al-w" style="margin-bottom:10px">⚠ Catálogo CW no cargado. Verifica la tabla catalogo_cw en Supabase y recarga.</div>':'';
+
+  const items=liq.items||[];
+  const addBtn=locked?'':
+    `<button class="btn btn-sm no-print" style="background:#CDFBF2;color:#000;font-weight:700"
+      onclick="openAddCWItem('${sitio.id}')">＋ Ítem CW</button>`;
+
+  // Nokia rows (con inputs de cantidad)
+  const nokiaRows=items.map(item=>{
+    const totN=(item.cant||0)*item.precio_nokia;
+    const safeId=item.actividad_id.replace(/[',]/g,'_');
+    return`<tr class="tr-nokia">
+      <td style="font-size:10px">${item.nombre}</td>
+      <td><span class="badge bg-k" style="font-size:8px">${item.unidad}</span></td>
+      <td>${locked
+        ?`<span style="font-weight:600;padding:2px 8px;font-size:12px">${item.cant||0}</span>`
+        :`<input class="iq" type="number" value="${item.cant||0}" min="0" step="any"
+          oninput="_updLiqCWCant('${sitio.id}','${item.actividad_id}',this.value)">`
+      }</td>
+      <td class="num">${cop(item.precio_nokia)}</td>
+      <td class="num fw7" id="cw-rn-${sitio.id}-${safeId}">${cop(totN)}</td>
+      <td class="no-print">${locked?'':`<button class="btn-del" onclick="delCWItem('${sitio.id}','${item.actividad_id}')">✕</button>`}</td>
+    </tr>`;
+  }).join('');
+
+  // SubC rows (solo ítems con precio_subc > 0; ítems de transporte asumidos por la empresa se omiten)
+  const subcItems=items.filter(item=>item.precio_subc>0);
+  const subcRows=subcItems.map(item=>{
+    const totS=(item.cant||0)*item.precio_subc;
+    const safeId=item.actividad_id.replace(/[',]/g,'_');
+    return`<tr class="tr-subc">
+      <td style="font-size:10px">${item.nombre}</td>
+      <td><span class="badge bg-k" style="font-size:8px">${item.unidad}</span></td>
+      <td style="text-align:center;font-weight:600;font-size:12px" id="cw-cant-s-${sitio.id}-${safeId}">${item.cant||0}</td>
+      <td class="num">${cop(item.precio_subc)}</td>
+      <td class="num fw7" id="cw-rs-${sitio.id}-${safeId}">${cop(totS)}</td>
+    </tr>`;
+  }).join('');
+
+  const noItemsRow=`<tr><td colspan="6" style="padding:24px;text-align:center;color:var(--g3)">
+    Sin ítems — usa <strong>＋ Ítem CW</strong> para agregar actividades
+  </td></tr>`;
+
+  document.getElementById('liq-cw-content').innerHTML=`
+    ${catWarn}
+    <!-- Header card: metadata -->
+    <div class="card" style="margin-bottom:10px">
+      <div class="card-h" style="background:#0f4c75;border-left-color:#48cae4">
+        <h2 style="color:#fff">${sitio.nombre} — Obra Civil CW</h2>
+        <div class="flex gap8" style="align-items:center">${estadoBadge} ${estadoBtn}</div>
+      </div>
+      <div class="card-b">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px">
+          <div class="fg mb0"><label class="fl">SMP / Código Nokia</label>
+            <input type="text" class="fc" value="${liq.smp||''}" ${locked?'disabled':''}
+              onblur="_updLiqCWField('${sitio.id}','smp',this.value)" placeholder="Ej: CO_CAL_12345">
+          </div>
+          <div class="fg mb0"><label class="fl">Región</label>
+            <input type="text" class="fc" value="${liq.region||''}" ${locked?'disabled':''}
+              onblur="_updLiqCWField('${sitio.id}','region',this.value)" placeholder="Ej: Valle del Cauca">
+          </div>
+          <div class="fg mb0"><label class="fl">Tipo Zona</label>
+            <select class="fc" ${locked?'disabled':''} onchange="_updLiqCWTipoZona('${sitio.id}',this.value)">
+              <option value="URBANO" ${liq.tipo_zona==='URBANO'?'selected':''}>URBANO</option>
+              <option value="RURAL" ${liq.tipo_zona==='RURAL'?'selected':''}>RURAL</option>
+            </select>
+          </div>
+          <div class="fg mb0"><label class="fl">LC / Subcontratista CW</label>
+            <input type="text" class="fc" value="${liq.lc||''}" ${locked?'disabled':''}
+              onblur="_updLiqCWField('${sitio.id}','lc',this.value)" placeholder="Nombre del SubC CW">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dual cards: Nokia (izq) + SubC (der) -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+
+      <!-- NOKIA CW -->
+      <div class="nokia-card card">
+        <div class="card-h" style="background:#144E4A;border-left-color:#CDFBF2">
+          <h2 style="color:#CDFBF2">Nokia — Venta CW</h2>
+          <div class="flex gap8" style="align-items:center">
+            <span class="badge" style="background:#CDFBF2;color:#000;font-size:10px">${items.length} ítems</span>
+            ${addBtn}
+          </div>
+        </div>
+        <div style="padding:0;overflow-x:auto;max-height:calc(100vh - 360px);overflow-y:auto">
+          <table class="tbl tbl-nokia">
+            <thead style="position:sticky;top:0;z-index:2"><tr>
+              <th style="min-width:200px">Actividad CW</th><th>Unidad</th><th>Cant</th>
+              <th class="num">P. Nokia</th><th class="num">Total Nokia</th>
+              <th class="no-print"></th>
+            </tr></thead>
+            <tbody>${items.length?nokiaRows:noItemsRow}</tbody>
+            <tfoot><tr style="background:#91A8A7;border-top:2px solid #144E4A">
+              <td colspan="3" style="font-weight:800;padding:8px;color:#000">TOTAL NOKIA CW</td>
+              <td></td>
+              <td class="num fw8" id="cw-tot-nokia-${sitio.id}" style="color:#000;font-size:13px;padding:8px">${cop(c.totNokia)}</td>
+              <td></td>
+            </tr></tfoot>
+          </table>
+        </div>
+      </div>
+
+      <!-- SUBC CW -->
+      <div class="subc-card card">
+        <div class="card-h" style="background:#FFF0CE;border-left-color:#FFC000">
+          <h2 style="color:#000">SubC — Costo CW</h2>
+          <span class="badge" style="background:#FFC000;color:#000;font-size:10px">${liq.lc||'SubC CW'}</span>
+        </div>
+        <div style="padding:0;overflow-x:auto;max-height:calc(100vh - 360px);overflow-y:auto">
+          <table class="tbl tbl-subc">
+            <thead style="position:sticky;top:0;z-index:2"><tr>
+              <th style="min-width:200px">Actividad CW</th><th>Unidad</th><th>Cant</th>
+              <th class="num">P. SubC</th><th class="num">Total SubC</th>
+            </tr></thead>
+            <tbody>${subcItems.length?subcRows:noItemsRow}</tbody>
+            <tfoot><tr style="background:#FFF0CE;border-top:2px solid #FFC000">
+              <td colspan="3" style="font-weight:800;padding:8px;color:#000">TOTAL SUBC CW</td>
+              <td></td>
+              <td class="num fw8" id="cw-tot-subc-${sitio.id}" style="color:#000;font-size:13px;padding:8px">${cop(c.totSubc)}</td>
+            </tr></tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen + Acciones -->
+    <div style="display:grid;grid-template-columns:1fr 260px;gap:14px">
+      <div class="card">
+        <div class="card-h"><h2>Utilidad & Margen CW</h2></div>
+        <div class="card-b">
+          <table style="width:100%;font-size:13px">
+            <tr><td style="color:var(--b);font-weight:700">Venta Nokia CW</td>
+              <td style="text-align:right;font-weight:800;font-size:16px;color:var(--b)">${cop(c.totNokia)}</td></tr>
+            <tr><td style="color:var(--r)">Costo SubC CW</td>
+              <td style="text-align:right;font-weight:700;color:var(--r)">${cop(c.totSubc)}</td></tr>
+            <tr><td colspan="2"><hr class="div"></td></tr>
+            <tr><td style="font-weight:800">UTILIDAD CW</td>
+              <td style="text-align:right;font-weight:800;font-size:20px;color:${mc}" id="cw-ut-${sitio.id}">${cop(c.utilidad)}</td></tr>
+          </table>
+          <div style="margin-top:10px">
+            <div class="fb" style="margin-bottom:3px">
+              <span style="font-size:10px;font-weight:700">% MARGEN CW</span>
+              <span style="font-size:20px;font-weight:800;color:${mc}" id="cw-mg-${sitio.id}">${pct(c.margen)}</span>
+            </div>
+            <div class="mbar"><div class="mfill ${mfcls(c.margen)}" style="width:${Math.min(c.margen*100,100)}%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="card no-print">
+        <div class="card-h"><h2>Acciones</h2></div>
+        <div class="card-b" style="display:flex;flex-direction:column;gap:8px">
+          ${!locked?`<button class="btn bp" onclick="_marcarLiqCW('${sitio.id}','final')">✓ Marcar como Final</button>`:''}
+          <button class="btn bk" onclick="exportarExcelCWSitio('${sitio.id}')">⬇ Excel CW</button>
+          <button class="btn bou btn-sm" onclick="showScreen('liquidador',document.querySelectorAll('.nt')[4])">← Liquidador TI</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+// ── Agregar / eliminar ítems CW ──────────────────────────────
+let _cwAddSitioId='';
+
+function openAddCWItem(sitioId){
+  const liq=getLiqCW(sitioId);if(!liq)return;
+  _cwAddSitioId=sitioId;
+  if(!CAT_CW.length){toast('Catálogo CW no cargado — recarga la app','err');return;}
+  const esRural=liq.tipo_zona==='RURAL';
+  const usados=new Set((liq.items||[]).map(i=>i.actividad_id));
+  const opts=CAT_CW
+    .filter(c=>!usados.has(c.actividad_id))
+    .map(c=>{
+      const pN=esRural?c.precio_nokia_rural:c.precio_nokia_urbano;
+      return`<option value="${c.actividad_id}">${c.actividad_id} — ${c.nombre.substring(0,60)}${c.nombre.length>60?'…':''} (${cop(pN)})</option>`;
+    }).join('');
+  document.getElementById('cw-add-act').innerHTML=
+    opts||'<option value="">Sin ítems disponibles</option>';
+  document.getElementById('cw-add-cant').value='1';
+  document.getElementById('cw-add-preview').style.display='none';
+  document.getElementById('cw-add-act').onchange=_previewCWItem;
+  openModal('m-add-cw-item');
+  _previewCWItem();
+}
+
+function _previewCWItem(){
+  const liq=getLiqCW(_cwAddSitioId);if(!liq)return;
+  const actId=document.getElementById('cw-add-act').value;
+  const cat=CAT_CW.find(c=>c.actividad_id===actId);
+  const prev=document.getElementById('cw-add-preview');
+  if(!cat){prev.style.display='none';return;}
+  const esRural=liq.tipo_zona==='RURAL';
+  const pN=esRural?cat.precio_nokia_rural:cat.precio_nokia_urbano;
+  const pS=esRural?cat.precio_subc_rural:cat.precio_subc_urbano;
+  document.getElementById('cw-add-preview-txt').innerHTML=
+    `<strong>${cat.nombre}</strong><br>
+     Unidad: <b>${cat.unidad}</b> &nbsp;|&nbsp;
+     Nokia: <b style="color:var(--b)">${cop(pN)}</b> &nbsp;|&nbsp;
+     SubC: <b style="color:var(--o)">${cop(pS)}</b>`;
+  prev.style.display='block';
+}
+
+function confirmarAddCWItem(){
+  const liq=getLiqCW(_cwAddSitioId);if(!liq)return;
+  const actId=document.getElementById('cw-add-act').value;
+  const cant=parseFloat(document.getElementById('cw-add-cant').value)||1;
+  if(!actId){toast('Selecciona un ítem','err');return;}
+  const cat=CAT_CW.find(c=>c.actividad_id===actId);if(!cat)return;
+  const esRural=liq.tipo_zona==='RURAL';
+  liq.items.push({
+    actividad_id:cat.actividad_id,nombre:cat.nombre,unidad:cat.unidad,cant,
+    precio_nokia:esRural?cat.precio_nokia_rural:cat.precio_nokia_urbano,
+    precio_subc:esRural?cat.precio_subc_rural:cat.precio_subc_urbano
+  });
+  saveLiqCWLocal(liq);
+  closeModal('m-add-cw-item');
+  const sitio=ST.sitios.find(s=>s.id===_cwAddSitioId);
+  if(sitio)renderLiquidadorCWSitio(sitio,liq);
+  toast('Ítem CW agregado');
+}
+
+function delCWItem(sitioId,actId){
+  const liq=getLiqCW(sitioId);if(!liq)return;
+  liq.items=liq.items.filter(i=>i.actividad_id!==actId);
+  saveLiqCWLocal(liq);
+  const sitio=ST.sitios.find(s=>s.id===sitioId);
+  if(sitio)renderLiquidadorCWSitio(sitio,liq);
+}
+
+// ── Catálogo CW ──────────────────────────────────────────────
+function renderCatalogoCW(){
+  const tbody=document.getElementById('tbody-cat-cw');
+  if(!tbody)return;
+  if(!CAT_CW.length){
+    tbody.innerHTML='<tr><td colspan="5" style="padding:20px;text-align:center;color:var(--g3)">Catálogo CW no cargado — verifica la tabla catalogo_cw en Supabase</td></tr>';
+    return;
+  }
+  const esRural=(document.getElementById('cat-cw-zona')?.value)==='RURAL';
+  tbody.innerHTML=CAT_CW.map(c=>{
+    const pN=esRural?c.precio_nokia_rural:c.precio_nokia_urbano;
+    const pS=esRural?c.precio_subc_rural:c.precio_subc_urbano;
+    return`<tr>
+      <td style="white-space:nowrap;font-weight:700;color:var(--b)">${c.actividad_id}</td>
+      <td style="font-size:10px">${c.nombre}</td>
+      <td><span class="badge bg-k" style="font-size:8px">${c.unidad}</span></td>
+      <td class="num" style="background:#eff6ff">${cop(pN)}</td>
+      <td class="num" style="background:#fffbeb">${cop(pS)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── Consolidado CW ──────────────────────────────────────────
+function renderConsolidadoCW(){
+  const filLC=(document.getElementById('fil-lc-cw')?.value)||'';
+  const lcSel=document.getElementById('fil-lc-cw');
+  if(lcSel){
+    const cur=lcSel.value;
+    const lcs=[...new Set(ST.liquidaciones_cw.map(l=>l.lc).filter(Boolean))].sort();
+    lcSel.innerHTML='<option value="">Todas las Cuadrillas (LC)</option>'+lcs.map(l=>`<option value="${l}" ${l===cur?'selected':''}>${l}</option>`).join('');
+    if(cur)lcSel.value=cur;
+  }
+  const filtered=ST.liquidaciones_cw.filter(l=>!filLC||l.lc===filLC);
+  let totN=0,totS=0,countFinal=0;
+  const rows=filtered.map(liq=>{
+    const c=calcLiqCW(liq);
+    totN+=c.totNokia;totS+=c.totSubc;
+    if(liq.estado==='final')countFinal++;
+    const estadoBadge=liq.estado==='final'
+      ?'<span class="badge bg-g" style="font-size:8px">FINAL</span>'
+      :'<span class="badge bg-o" style="font-size:8px">PRE</span>';
+    return`<tr>
+      <td><strong>${liq.sitio_id}</strong></td>
+      <td style="font-size:10px">${liq.smp||'—'}</td>
+      <td style="font-size:10px">${liq.region||'—'}</td>
+      <td><span class="badge bg-b" style="font-size:8px">${liq.tipo_zona}</span></td>
+      <td style="font-size:10px">${liq.lc||'—'}</td>
+      <td>${estadoBadge}</td>
+      <td class="num fw7" style="color:var(--b)">${cop(c.totNokia)}</td>
+      <td class="num" style="color:var(--o)">${cop(c.totSubc)}</td>
+      <td class="num fw7 ${c.utilidad>=0?'tg':'tr'}">${cop(c.utilidad)}</td>
+      <td class="num"><span class="badge ${mcls(c.margen)}">${pct(c.margen)}</span></td>
+      <td>
+        <button class="btn bou btn-sm" onclick="abrirLiquidadorCW('${liq.sitio_id}')">Abrir</button>
+        ${ST.isAdmin&&liq.estado!=='final'?`<button class="btn-del" onclick="deleteLiqCW('${liq.id}')">✕</button>`:''}
+      </td>
+    </tr>`;
+  }).join('');
+
+  document.getElementById('tbody-cw-cons').innerHTML=rows||'<tr><td colspan="11" class="tm" style="padding:20px;text-align:center">Sin liquidaciones CW — abre un sitio TI y usa el botón "Liquidador CW"</td></tr>';
+  const totU=totN-totS,totM=totN>0?totU/totN:0;
+  document.getElementById('tfoot-cw-cons').innerHTML=`<tr class="tr-tot">
+    <td colspan="6"><strong>TOTAL CW</strong></td>
+    <td class="num fw8">${cop(totN)}</td>
+    <td class="num fw8">${cop(totS)}</td>
+    <td class="num fw8">${cop(totU)}</td>
+    <td class="num fw8"><span class="badge ${mcls(totM)}">${pct(totM)}</span></td>
+    <td></td>
+  </tr>`;
+
+  // Stats
+  document.getElementById('cw-stats').innerHTML=`
+    <div class="stat" style="border-color:#0f4c75"><div class="sl">Liquidaciones CW</div><div class="sv">${filtered.length}</div><div class="ss">${countFinal} finales</div></div>
+    <div class="stat" style="border-color:var(--b)"><div class="sl">Venta Nokia CW</div><div class="sv" style="font-size:14px">${cop(totN)}</div></div>
+    <div class="stat" style="border-color:var(--o)"><div class="sl">Costo SubC CW</div><div class="sv" style="font-size:14px;color:var(--o)">${cop(totS)}</div></div>`;
+}
+
+// ============================================================
+// EXPORTAR EXCEL — con formato y colores
 // ============================================================
 function exportarExcel(){
-  const wb=XLSX.utils.book_new();
-  // CONSOLIDATED
-  const consData=[['Sitio','Fecha','LC','Empresa','TI','ADJ','CW','CR','Venta Nokia','SubC TI','SubC CW','Mat TI','Mat CW','Logística','Adicionales','Costo SubC','Utilidad','% Margen']];
-  ST.sitios.forEach(s=>{
+  const wb = XLSX.utils.book_new();
+
+  // ── Paleta de colores ──
+  const C = {
+    teal:'144E4A', tealMid:'1B6E50',
+    gold:'FFC000', goldHdr:'FFD54F', goldLight:'FFF2CC',
+    white:'FFFFFF', black:'000000',
+    grey:'F5F5F5', green:'1A7A1A', red:'C0392B'
+  };
+
+  // ── Constructores de celda ──
+  function xc(v, bg, fg, bold, align, bdr){
+    const t = (typeof v==='number')?'n':'s';
+    const s = {
+      fill: bg?{patternType:'solid',fgColor:{rgb:bg}}:{patternType:'none'},
+      font: {color:{rgb:fg||C.black}, bold:!!bold, sz:10, name:'Calibri'},
+      alignment: {horizontal:align||'left', vertical:'center', wrapText:false}
+    };
+    if(bdr) s.border={top:{style:'thin',color:{rgb:'CCCCCC'}},bottom:{style:'thin',color:{rgb:'CCCCCC'}},left:{style:'thin',color:{rgb:'CCCCCC'}},right:{style:'thin',color:{rgb:'CCCCCC'}}};
+    return {v:v??'', t, s};
+  }
+  const hdrC = (v,bg,fg)=>xc(v,bg,fg||C.white,true,'center');
+  const lbl  = v=>xc(v,C.teal,C.white,true,'left');
+  const val  = (v,bold,align)=>xc(v,C.white,C.black,bold,align||'left',true);
+  const num  = (v,bold,bg)=>xc(v,bg||C.white,C.black,bold,'right',true);
+  const emp  = (n=6)=>Array(n).fill(xc('',C.white));
+
+  // ── Aplica celdas con estilo al worksheet ──
+  function buildWS(rows, merges, colW){
+    const data=rows.map(r=>r.map(c=>(c&&typeof c==='object'&&'v'in c)?c.v:c));
+    const ws=XLSX.utils.aoa_to_sheet(data);
+    rows.forEach((row,ri)=>{
+      row.forEach((c,ci)=>{
+        if(c&&typeof c==='object'&&c.s){
+          const addr=XLSX.utils.encode_cell({r:ri,c:ci});
+          if(!ws[addr])ws[addr]={v:c.v??'',t:typeof c.v==='number'?'n':'s'};
+          ws[addr].s=c.s;
+        }
+      });
+    });
+    if(merges)ws['!merges']=merges;
+    if(colW)ws['!cols']=colW.map(w=>({wch:w}));
+    return ws;
+  }
+
+  // ── HOJA CONSOLIDADO ──────────────────────────────────────
+  const cHdrs=['Sitio','Fecha','LC','Empresa','Ciudad','Cat','Estado',
+    'TI Nokia','ADJ Nokia','CW Nokia','CR Nokia','Venta Total',
+    'SubC TI','SubC CW','Mat TI','Mat CW','Logística','Adic.','BackOffice',
+    'Costo Total','Utilidad','% Margen'];
+  const cRows=[];
+  cRows.push([hdrC('CONSOLIDADO — SITIOS TI',C.teal),...Array(cHdrs.length-1).fill(xc('',C.teal))]);
+  cRows.push(cHdrs.map(h=>hdrC(h,C.tealMid)));
+  ST.sitios.filter(s=>s.tipo==='TI').forEach((s,i)=>{
     const c=calcSitio(s),sub=SUBCS.find(x=>x.lc===s.lc);
+    const bg=i%2===0?C.white:C.grey;
     const costoSubc=(c.subcTI||0)+(c.subcADJ||0)+(c.subcCR||0)+(c.subcCW||0);
-    consData.push([s.nombre,s.fecha,s.lc,sub?.empresa||'',c.nokiaTI,c.nokiaADJ,c.nokiaCW,c.nokiaCR,c.totalVenta,c.subcTI,c.subcCW,c.matTI,c.matCW,c.logist,c.adicion,costoSubc,c.utilidad,parseFloat((c.margen*100).toFixed(1))]);
+    cRows.push([
+      xc(s.nombre,bg,C.black,true,'left',true), xc(s.fecha,bg,C.black,false,'center',true),
+      xc(s.lc,bg,C.black,false,'left',true), xc(sub?.empresa||'',bg,C.black,false,'left',true),
+      xc(s.ciudad,bg,C.black,false,'left',true), xc(s.cat,bg,C.black,false,'center',true),
+      xc(s.estado||'pre',bg,C.black,false,'center',true),
+      num(c.nokiaTI,false,bg), num(c.nokiaADJ,false,bg), num(c.nokiaCW,false,bg), num(c.nokiaCR,false,bg),
+      num(c.totalVenta,true,bg), num(c.subcTI,false,bg), num(c.subcCW,false,bg),
+      num(c.matTI,false,bg), num(c.matCW,false,bg), num(c.logist,false,bg),
+      num(c.adicion,false,bg), num(c.backoffice||0,false,bg), num(c.totalCosto,false,bg),
+      xc(c.utilidad,bg,c.utilidad>=0?C.green:C.red,true,'right',true),
+      xc(parseFloat((c.margen*100).toFixed(1))+'%',bg,C.black,false,'right',true)
+    ]);
   });
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(consData),'Consolidado');
-  const gastData=[['Sitio','Tipo','Descripcion','Valor']];
-  ST.gastos.forEach(g=>gastData.push([g.sitio,g.tipo,g.desc,g.valor]));
-  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(gastData),'Gastos');
-  ST.sitios.forEach(s=>{
-    const cc=calcSitio(s),sub=SUBCS.find(x=>x.lc===s.lc);
-    const wsn=s.nombre.replace(/[:\/\[\]*?]/g,'').substring(0,28);
-    const rows=[
-      ['LIQUIDACION DE SITIO','','','','',''],
-      ['Sitio:',s.nombre,'Fecha:',s.fecha,'Ciudad:',s.ciudad],
-      ['LC:',s.lc,'Empresa:',sub?sub.empresa:'','Cat:',s.cat],
-      ['','','','','',''],
-      ['NOKIA - LIQUIDACION VENTA','','','','',''],
-      ['Actividad','Seccion','Unidad','Cantidad','P. Nokia','Total Nokia'],
-    ];
-    cc.acts.forEach(a=>rows.push([a.def?a.def.nombre:a.id,a.sec,a.def?a.def.unidad:'',a.cant,a.preNokia,a.totalNokia]));
-    if(s.cw_nokia>0)rows.push(['CW Obra Civil','CW','Sitio',1,s.cw_nokia,s.cw_nokia]);
-    rows.push(['','','','','TOTAL VENTA:',cc.totalVenta]);
-    rows.push(['','','','','','']);
-    rows.push(['SUBCONTRATISTA - LIQUIDACION COSTO','','','','','']);
-    rows.push(['Actividad','Seccion','Unidad','Cantidad','P. SubC','Total SubC']);
-    cc.acts.filter(a=>a.id!=='PM'&&a.preSubc>0).forEach(a=>rows.push([a.def?a.def.nombre:a.id,a.sec,a.def?a.def.unidad:'',a.cant,a.preSubc,a.totalSubc]));
-    if(s.cw_costo>0)rows.push(['CW SubContratista','CW','Sitio',1,s.cw_costo,s.cw_costo]);
-    rows.push(['','Materiales TI:',cc.matTI,'Materiales CW:',cc.matCW,'']);
-    rows.push(['','Logistica:',cc.logist,'Adicionales:',cc.adicion,'']);
-    rows.push(['','BackOffice:',cc.backoffice,'TOTAL COSTO:',cc.totalCosto,'']);
-    rows.push(['','UTILIDAD:',cc.utilidad,'% MARGEN:',(cc.margen*100).toFixed(1)+'%','']);
+  const consWS=buildWS(cRows,[{s:{r:0,c:0},e:{r:0,c:cHdrs.length-1}}],
+    [32,12,16,20,18,6,8,13,13,13,13,14,13,13,11,11,11,9,10,13,13,9]);
+  XLSX.utils.book_append_sheet(wb,consWS,'Consolidado TI');
+
+  // ── HOJAS POR SITIO ───────────────────────────────────────
+  ST.sitios.filter(s=>s.tipo==='TI').forEach(s=>{
+    const cc=calcSitio(s), sub=SUBCS.find(x=>x.lc===s.lc);
     const gSitio=ST.gastos.filter(g=>g.sitio===s.id);
-    if(gSitio.length){rows.push(['GASTOS','','','','','']);gSitio.forEach(g=>rows.push([g.tipo,g.desc,g.valor,'','','']));}
-    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(rows),wsn);
+    const wsn=s.nombre.replace(/[:\/\[\]*?]/g,'').substring(0,28);
+    const rows=[], merges=[];
+    let r=0;
+
+    // Info header
+    rows.push([lbl('SITIO:'),     val(s.nombre,true),      xc('',C.white),xc('',C.white), lbl('Fecha:'),  val(s.fecha,false,'center')]);
+    rows.push([lbl('Tipo:'),      val('TI'),                xc('',C.white),xc('',C.white), lbl('Ciudad:'), val(s.ciudad)]);
+    rows.push([lbl('LC:'),        val(s.lc,true),           xc('',C.white),xc('',C.white), lbl('Cat:'),    val(s.cat,false,'center')]);
+    rows.push([lbl('Estado:'),    val(s.estado||'pre'),     xc('',C.white),xc('',C.white), lbl('CW:'),     val(s.tiene_cw?(s.cw_conjunto?'Conjunto':'Sí'):'No',false,'center')]);
+    r+=4;
+
+    rows.push(emp()); r++;
+
+    // Nokia section
+    rows.push([hdrC('NOKIA — LIQUIDACIÓN VENTA',C.teal),...Array(5).fill(xc('',C.teal))]);
+    merges.push({s:{r,c:0},e:{r,c:5}}); r++;
+    rows.push(['Actividad','Sección','Unidad','Cantidad','P. Nokia','Total Nokia'].map(h=>hdrC(h,C.tealMid)));
+    r++;
+    cc.acts.forEach(a=>{
+      rows.push([xc(a.def?a.def.nombre:a.id,C.white,C.black,false,'left',true),xc(a.sec||'',C.white,C.black,false,'left',true),xc(a.def?a.def.unidad:'',C.white,C.black,false,'center',true),num(a.cant||0),num(a.preNokia),num(a.totalNokia,true)]);
+      r++;
+    });
+    if(s.cw_nokia>0){rows.push([xc('CW Obra Civil',C.white,C.black,false,'left',true),xc('CW',C.white,C.black,false,'center',true),xc('Sitio',C.white,C.black,false,'center',true),num(1),num(s.cw_nokia),num(s.cw_nokia,true)]);r++;}
+    rows.push([hdrC('TOTAL VENTA NOKIA',C.goldLight,C.black),...Array(4).fill(xc('',C.goldLight)),num(cc.totalVenta,true,C.goldLight)]);
+    merges.push({s:{r,c:0},e:{r,c:4}}); r++;
+
+    rows.push(emp()); r++;
+
+    // SubC section
+    rows.push([hdrC('SUBCONTRATISTA — LIQUIDACIÓN PAGO',C.gold,C.black),...Array(5).fill(xc('',C.gold))]);
+    merges.push({s:{r,c:0},e:{r,c:5}}); r++;
+    rows.push(['Actividad','Sección','Unidad','Cantidad','P. SubC','Total SubC'].map(h=>hdrC(h,C.goldHdr,C.black)));
+    r++;
+    cc.acts.filter(a=>a.id!=='PM'&&a.preSubc>0&&!a.subcExcluded).forEach(a=>{
+      rows.push([xc(a.def?a.def.nombre:a.id,C.white,C.black,false,'left',true),xc(a.sec||'',C.white,C.black,false,'left',true),xc(a.def?a.def.unidad:'',C.white,C.black,false,'center',true),num(a.cant||0),num(a.preSubc),num(a.totalSubc,true)]);
+      r++;
+    });
+    if(s.cw_costo>0){rows.push([xc('CW SubContratista',C.white,C.black,false,'left',true),xc('CW',C.white,C.black,false,'center',true),xc('Sitio',C.white,C.black,false,'center',true),num(1),num(s.cw_costo),num(s.cw_costo,true)]);r++;}
+    const totSubcVal=(cc.subcTI||0)+(cc.subcADJ||0)+(cc.subcCR||0)+(cc.subcCW||0);
+    rows.push([hdrC('TOTAL SUBC',C.goldLight,C.black),...Array(4).fill(xc('',C.goldLight)),num(totSubcVal,true,C.goldLight)]);
+    merges.push({s:{r,c:0},e:{r,c:4}}); r++;
+
+    rows.push(emp()); r++;
+
+    // Costos operativos
+    rows.push([hdrC('COSTOS OPERATIVOS',C.teal),...Array(5).fill(xc('',C.teal))]);
+    merges.push({s:{r,c:0},e:{r,c:5}}); r++;
+    const co=(label,v)=>{
+      const row=[xc(label,C.white,C.black,false,'left',true),xc('',C.white),xc('',C.white),xc('',C.white),xc('',C.white),num(v)];
+      merges.push({s:{r,c:0},e:{r,c:4}}); r++;
+      return row;
+    };
+    rows.push(co('SubC TI+ADJ+CR:',(cc.subcTI||0)+(cc.subcADJ||0)+(cc.subcCR||0)));
+    rows.push(co('SubC CW:',cc.subcCW||0));
+    rows.push(co('Mat TI:',cc.matTI||0));
+    rows.push(co('Mat CW:',cc.matCW||0));
+    rows.push(co('Logística:',cc.logist||0));
+    rows.push(co('Adicionales:',cc.adicion||0));
+    rows.push(co('BackOffice:',cc.backoffice||0));
+    rows.push([hdrC('TOTAL COSTO:',C.teal),...Array(4).fill(xc('',C.teal)),num(cc.totalCosto,true,C.teal)]);
+    merges.push({s:{r,c:0},e:{r,c:4}}); r++;
+    const ucol=cc.utilidad>=0?C.green:C.red;
+    rows.push([xc('UTILIDAD:',C.white,ucol,true,'left',true),...Array(4).fill(xc('',C.white)),xc(cc.utilidad,C.white,ucol,true,'right',true)]);
+    merges.push({s:{r,c:0},e:{r,c:4}}); r++;
+    const pctVal=parseFloat((cc.margen*100).toFixed(1))+'%';
+    const pcol=cc.margen>=0.3?C.green:cc.margen>=0.2?'E65C00':C.red;
+    rows.push([xc('% MARGEN:',C.white,C.black,true,'left',true),...Array(4).fill(xc('',C.white)),xc(pctVal,C.white,pcol,true,'right',true)]);
+    merges.push({s:{r,c:0},e:{r,c:4}}); r++;
+
+    // Gastos
+    if(gSitio.length){
+      rows.push(emp()); r++;
+      rows.push([hdrC('GASTOS REGISTRADOS',C.teal),...Array(5).fill(xc('',C.teal))]);
+      merges.push({s:{r,c:0},e:{r,c:5}}); r++;
+      rows.push([hdrC('Tipo',C.tealMid),hdrC('Descripción',C.tealMid),xc('',C.tealMid),xc('',C.tealMid),xc('',C.tealMid),hdrC('Valor',C.tealMid)]);
+      merges.push({s:{r,c:1},e:{r,c:4}}); r++;
+      gSitio.forEach((g,i)=>{
+        const bg=i%2===0?C.white:C.grey;
+        rows.push([xc(g.tipo,bg,C.black,false,'left',true),xc(g.desc,bg,C.black,false,'left',true),xc('',bg),xc('',bg),xc('',bg),num(g.valor,false,bg)]);
+        merges.push({s:{r,c:1},e:{r,c:4}}); r++;
+      });
+    }
+
+    const ws=buildWS(rows,merges,[35,18,10,10,16,16]);
+    XLSX.utils.book_append_sheet(wb,ws,wsn);
   });
+
   XLSX.writeFile(wb,'Liquidador_'+(_empresaConfig.nombre_corto||'Nokia')+'_'+new Date().toISOString().split('T')[0]+'.xlsx');
-  toast('Excel exportado con todas las liquidaciones');
+  toast('Excel exportado con formato completo');
+}
+
+// ── Export Excel CW ───────────────────────────────────────────
+function _buildCWExcelSheets(liqs){
+  // Hoja 1: Services Template CW (formato liquidación Nokia)
+  const sh1=[
+    ['SERVICES TEMPLATE — OBRA CIVIL (CW)','','','','','',''],
+    ['Empresa:',(_empresaConfig.nombre||''),'','Fecha:',new Date().toLocaleDateString('es-CO'),'',''],
+    ['','','','','','',''],
+    ['Sitio TI','SMP','Región','Tipo Zona','LC','Actividad CW','Unidad','Cantidad','Precio Nokia','Total Nokia']
+  ];
+  liqs.forEach(liq=>{
+    const items=(liq.items||[]).filter(i=>(i.cant||0)>0);
+    if(!items.length)return;
+    items.forEach((item,idx)=>{
+      sh1.push([
+        idx===0?liq.sitio_id:'',
+        idx===0?liq.smp:'',
+        idx===0?liq.region:'',
+        idx===0?liq.tipo_zona:'',
+        idx===0?liq.lc:'',
+        item.nombre,item.unidad,item.cant||0,
+        item.precio_nokia||0,
+        (item.cant||0)*(item.precio_nokia||0)
+      ]);
+    });
+    const c=calcLiqCW(liq);
+    sh1.push(['','','','','','','','','SUBTOTAL:',c.totNokia]);
+    sh1.push(['','','','','','','','','','']);
+  });
+  const totNokia=liqs.reduce((s,l)=>s+calcLiqCW(l).totNokia,0);
+  sh1.push(['','','','','','','','','TOTAL NOKIA CW:',totNokia]);
+
+  // Hoja 2: Formato Preliquidación (formato SubC)
+  const sh2=[
+    ['FORMATO PRELIQUIDACIÓN — OBRA CIVIL (CW)','','','','','',''],
+    ['Empresa:',(_empresaConfig.nombre||''),'','Fecha:',new Date().toLocaleDateString('es-CO'),'',''],
+    ['','','','','','',''],
+    ['Sitio TI','SMP','Región','Tipo Zona','LC','Estado','Actividad CW','Unidad','Cantidad','P. Nokia','Total Nokia','P. SubC','Total SubC','Utilidad Item']
+  ];
+  liqs.forEach(liq=>{
+    const items=(liq.items||[]).filter(i=>(i.cant||0)>0);
+    if(!items.length)return;
+    items.forEach((item,idx)=>{
+      const totN=(item.cant||0)*(item.precio_nokia||0);
+      const totS=(item.cant||0)*(item.precio_subc||0);
+      sh2.push([
+        idx===0?liq.sitio_id:'',
+        idx===0?liq.smp:'',
+        idx===0?liq.region:'',
+        idx===0?liq.tipo_zona:'',
+        idx===0?liq.lc:'',
+        idx===0?liq.estado.toUpperCase():'',
+        item.nombre,item.unidad,item.cant||0,
+        item.precio_nokia||0,totN,
+        item.precio_subc||0,totS,
+        totN-totS
+      ]);
+    });
+    const c=calcLiqCW(liq);
+    sh2.push(['','','','','','','','','SUBTOTALES:',
+      '',c.totNokia,'',c.totSubc,c.utilidad]);
+    sh2.push(['','','','','','','','','MARGEN:',
+      '','','','',(c.margen*100).toFixed(1)+'%']);
+    sh2.push(['','','','','','','','','','','','','','']);
+  });
+  const allC=liqs.map(l=>calcLiqCW(l));
+  const tN=allC.reduce((s,c)=>s+c.totNokia,0);
+  const tS=allC.reduce((s,c)=>s+c.totSubc,0);
+  sh2.push(['','','','','','','','','TOTAL:','',tN,'',tS,tN-tS]);
+
+  return{sh1,sh2};
+}
+
+function exportarExcelCW(){
+  if(!ST.liquidaciones_cw.length){toast('Sin liquidaciones CW para exportar','err');return;}
+  const wb=XLSX.utils.book_new();
+  const{sh1,sh2}=_buildCWExcelSheets(ST.liquidaciones_cw);
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sh1),'Services Template CW');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sh2),'Formato Preliquidacion');
+  XLSX.writeFile(wb,'CW_'+(_empresaConfig.nombre_corto||'Nokia')+'_'+new Date().toISOString().split('T')[0]+'.xlsx');
+  toast('Excel CW exportado (2 hojas)');
+}
+
+function exportarExcelCWSitio(sitioId){
+  const id=sitioId||document.getElementById('sel-liq-cw')?.value;
+  if(!id){toast('Selecciona un sitio','err');return;}
+  const liq=getLiqCW(id);
+  if(!liq){toast('Sin liquidación CW para este sitio','err');return;}
+  const wb=XLSX.utils.book_new();
+  const{sh1,sh2}=_buildCWExcelSheets([liq]);
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sh1),'Services Template CW');
+  XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(sh2),'Formato Preliquidacion');
+  XLSX.writeFile(wb,'CW_'+id.replace(/[:\/\[\]*?]/g,'').substring(0,28)+'_'+new Date().toISOString().split('T')[0]+'.xlsx');
+  toast('Excel CW exportado');
 }
 
 function renderLCPanel(){
