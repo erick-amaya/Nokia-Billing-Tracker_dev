@@ -72,10 +72,11 @@ Nokia-Billing-Tracker-[Empresa]/
 | Rol | Permisos |
 |---|---|
 | `admin` | Todo: configuración, catálogo, historial, eliminar sitios, reabrir liquidaciones |
+| `coord` | Editar sitios, reabrir liquidaciones finales (TI y CW), agregar LC — sin acceso a precios ni configuración |
 | `operador` | Crear/editar sitios, liquidar, registrar gastos |
 | `viewer` | Solo lectura |
 
-Los roles se asignan en la tabla `user_roles` de Supabase (columnas: `email`, `rol`).
+Los roles se asignan en la tabla `user_roles` de Supabase (columnas: `user_id` UUID, `role`).
 
 ---
 
