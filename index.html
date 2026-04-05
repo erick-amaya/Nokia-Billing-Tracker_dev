@@ -96,6 +96,7 @@ input[type=date].fc{min-width:0;width:100%;box-sizing:border-box;-webkit-appeara
 .bg-pu{background:#e9d8fd;color:#553c9a}
 /* TABLE */
 .tbl{width:100%;border-collapse:collapse;font-size:11px}
+#tbl-subc{min-width:620px}
 .tbl th{background:#f0f7f0;color:var(--go);font-family:'Barlow Condensed',sans-serif;font-weight:700;letter-spacing:.7px;text-transform:uppercase;font-size:9px;padding:7px 8px;text-align:left;white-space:nowrap;border-bottom:2px solid #c8e6c8}
 .tbl-nokia th{background:#91A8A7!important;color:#000000!important;font-size:11px!important;font-weight:800!important;padding:9px 10px!important;letter-spacing:.8px!important}
 .tbl-subc th{background:#FFD36C!important;color:#000000!important;font-size:11px!important;font-weight:800!important;padding:9px 10px!important;letter-spacing:.8px!important}
@@ -269,9 +270,11 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
 /* Landscape mobile: tabla scroll con altura adecuada */
 #dash-tbl-wrap{max-height:calc(100vh - 320px)}
 #cons-tbl-wrap{max-height:calc(100vh - 240px)}
+#margen-bars{max-height:calc(100vh - 400px)}
 @media (max-height:500px){
   #dash-tbl-wrap{max-height:calc(100vh - 105px)}
   #cons-tbl-wrap{max-height:calc(100vh - 90px)}
+  #margen-bars{max-height:calc(100vh - 110px)}
 }
 @media print{.hdr,.nav,.no-print{display:none!important}body{background:#fff}.main{padding:0;max-width:100%}}
 /* ═══ HAMBURGER MENU BUTTON ═══ */
@@ -473,7 +476,7 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
     <div>
       <div class="card">
         <div class="card-h"><h2>Márgenes</h2></div>
-        <div class="card-b" id="margen-bars" style="max-height:calc(100vh - 400px);overflow-y:auto"></div>
+        <div class="card-b" id="margen-bars" style="overflow-y:auto"></div>
       </div>
       <div class="card">
         <div class="card-h"><h2>Acciones Rápidas</h2></div>
