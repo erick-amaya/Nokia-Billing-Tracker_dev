@@ -4539,18 +4539,34 @@ function _procesarCSVPreciosCW(text){
 
 async function guardarCatalogoCW(){
   if(!USE_SUPABASE){toast('Sin conexión Supabase','err');return;}
-  const supa=getSupabase();if(!supa)return;
-  let ok=0,err=0;
-  for(const c of CAT_CW){
-    const {error}=await supa.from('catalogo_cw').upsert({
+  const supa=getSupabase();
+  if(!supa){toast('No se pudo conectar con Supabase — recarga la app','err');return;}
+  if(!CAT_CW.length){toast('Catálogo CW vacío, nada que guardar','err');return;}
+  const btn=document.getElementById('btn-cw-save');
+  if(btn){btn.disabled=true;btn.textContent='Guardando…';}
+  try{
+    // Upsert en lotes de 50 para mayor eficiencia
+    const rows=CAT_CW.map(c=>({
       actividad_id:c.actividad_id, nombre:c.nombre, unidad:c.unidad,
-      precio_nokia_urbano:c.precio_nokia_urbano, precio_nokia_rural:c.precio_nokia_rural,
-      precio_subc_urbano:c.precio_subc_urbano,   precio_subc_rural:c.precio_subc_rural
-    },{onConflict:'actividad_id'});
-    error?err++:ok++;
+      precio_nokia_urbano:Number(c.precio_nokia_urbano)||0,
+      precio_nokia_rural :Number(c.precio_nokia_rural)||0,
+      precio_subc_urbano :Number(c.precio_subc_urbano)||0,
+      precio_subc_rural  :Number(c.precio_subc_rural)||0
+    }));
+    const SIZE=50; let err=0;
+    for(let i=0;i<rows.length;i+=SIZE){
+      const {error}=await supa.from('catalogo_cw')
+        .upsert(rows.slice(i,i+SIZE),{onConflict:'actividad_id'});
+      if(error){console.error('guardarCatalogoCW error:',error.message);err++;}
+    }
+    if(err){toast(`Error al guardar: revisa la consola (RLS o permisos)`,'err');}
+    else{logCambio('Actualizar Catálogo CW','catalogo_cw',`${rows.length} ítems`);toast(`✓ Catálogo CW guardado (${rows.length} ítems)`);}
+  }catch(e){
+    console.error('guardarCatalogoCW excepción:',e);
+    toast('Error inesperado: '+e.message,'err');
+  }finally{
+    if(btn){btn.disabled=false;btn.textContent='💾 Guardar CW';}
   }
-  if(!err) logCambio('Actualizar Catálogo CW','catalogo_cw',`${ok} ítems actualizados`);
-  err?toast(`Guardado con ${err} errores`,'err'):toast(`✓ Catálogo CW guardado (${ok} ítems)`);
 }
 
 // ── Consolidado CW ──────────────────────────────────────────
