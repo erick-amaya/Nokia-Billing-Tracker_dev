@@ -2404,7 +2404,7 @@ function renderLiqTSS(sitio){
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
           ${isFinal
             ?`<span class="badge" style="background:#1a7a1a;color:#fff;padding:2px 10px;font-size:11px">FINAL</span>
-               <button class="btn bou btn-sm no-print" style="padding:2px 10px;min-width:0;font-size:11px;line-height:1.4" onclick="updSitio('${sitio.id}','estado','pre');cargarSitio('${sitio.id}')">↩ A PRE</button>`
+               ${(ST.isAdmin||ST.isCoord)?`<button class="btn bou btn-sm no-print" style="padding:2px 10px;min-width:0;font-size:11px;line-height:1.4" onclick="updSitio('${sitio.id}','estado','pre');cargarSitio('${sitio.id}')">↩ A PRE</button>`:''}`
             :`<span class="badge" style="background:#d68910;color:#fff;padding:2px 10px;font-size:11px">PRE</span>
                <button class="btn bp btn-sm no-print" style="padding:2px 10px;min-width:0;font-size:11px;line-height:1.4" onclick="updSitio('${sitio.id}','estado','final');cargarSitio('${sitio.id}')">✓ Marcar FINAL</button>`
           }
