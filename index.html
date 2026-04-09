@@ -513,7 +513,7 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
     <div class="flex gap8">
       <input type="text" class="fc" id="fil-buscar-sitios" placeholder="🔍 Buscar sitio, LC, ciudad…" style="width:220px" oninput="renderConsolidado()">
       <select class="fc" id="fil-lc-sitios" style="width:180px" onchange="renderConsolidado()">
-        <option value="">Todas las Cuadrillas (LC)</option>
+        <option value="">Todos los LC</option>
       </select>
       <button class="btn bp no-print" onclick="openModal('m-nuevo-sitio')">＋ Nuevo</button>
     </div>
@@ -552,19 +552,31 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
     <h1 style="font-family:'Barlow Condensed',sans-serif;font-size:21px;font-weight:700">Consolidado TSS</h1>
     <button class="btn bk btn-sm no-print" onclick="showScreen('dashboard',document.querySelector('.nt'))" style="font-size:10px">← Dashboard</button>
     <div class="flex gap8">
-      <select class="fc" id="tss-fil-lc" style="width:200px" onchange="renderConsolidadoTSS()">
-        <option value="">Todas las Cuadrillas (LC)</option>
+      <select class="fc" id="tss-fil-lc" style="width:175px" onchange="renderConsolidadoTSS()">
+        <option value="">Todos los LC (Visita)</option>
+      </select>
+      <select class="fc" id="tss-fil-lc-rep" style="width:175px" onchange="renderConsolidadoTSS()">
+        <option value="">LC Reporte (todos)</option>
       </select>
     </div>
   </div>
   <div class="card">
     <div style="padding:0;overflow-x:auto;max-height:calc(100vh - 200px);overflow-y:auto">
       <table class="tbl" id="tbl-tss-cons">
-        <thead style="position:sticky;top:0;z-index:2"><tr>
-          <th>Sitio</th><th>Fecha</th><th>LC</th><th>Ciudad</th><th>Cat</th>
-          <th class="num th-nokia">Venta TSS</th><th class="num th-subc">Costo SubC</th>
-          <th rowspan="1"></th>
-        </tr></thead>
+        <thead style="position:sticky;top:0;z-index:2">
+          <tr>
+            <th colspan="6" style="background:#f0f7f0;border:none;padding:2px 0"></th>
+            <th class="th-tab-nokia" colspan="3">NOKIA TSS</th>
+            <th class="th-tab-subc" colspan="3">SUBC TSS</th>
+            <th style="background:#f0f7f0;border:none;padding:0"></th>
+          </tr>
+          <tr>
+            <th>Sitio</th><th>Fecha</th><th>LC Visita</th><th>Ciudad</th><th>Cat</th><th class="num">Cant.Sitios</th>
+            <th class="num th-nokia">VISITA</th><th class="num th-nokia">REPORTE</th><th class="num th-nokia">REDISEÑO</th>
+            <th class="num th-subc">SubC Vis.</th><th class="num th-subc">SubC Rep.</th><th class="num th-subc">SubC Red.</th>
+            <th></th>
+          </tr>
+        </thead>
         <tbody id="tbody-tss-cons"></tbody>
         <tfoot id="tfoot-tss-cons" style="position:sticky;bottom:0;z-index:2"></tfoot>
       </table>
@@ -621,7 +633,7 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
     <div class="flex gap8">
       <div class="fecha-picker" id="fp-rep"></div>
       <select class="fc tc-select" id="rep-tipo-cuadrilla" data-lc="true" style="width:140px" onchange="renderReportes()">
-        <option value="todos">Todas las Cuadrillas</option>
+        <option value="todos">Todos los LC</option>
       </select>
 
       <select class="fc" id="rep-lc-filter" style="width:180px" onchange="renderReportes()">
@@ -667,7 +679,7 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
       <button class="btn bk btn-sm no-print" onclick="showScreen('dashboard',document.querySelector('.nt'))" style="font-size:10px">← Dashboard</button>
       <div class="fecha-picker" id="fp-ana"></div>
       <select class="fc tc-select" id="ana-tc-filter" style="width:140px" onchange="renderAnalitica()">
-        <option value="todos">Todas las Cuadrillas</option>
+        <option value="todos">Todos los LC</option>
       </select>
       <select class="fc" id="ana-lc-filter" style="width:180px" onchange="renderAnalitica()">
         <option value="">Todos los LC</option>
@@ -806,7 +818,7 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
     <div class="flex gap8">
       <div class="fecha-picker" id="fp-cw"></div>
       <select class="fc" id="fil-lc-cw" style="width:200px" onchange="renderConsolidadoCW()">
-        <option value="">Todas las Cuadrillas (LC)</option>
+        <option value="">Todos los LC</option>
       </select>
       <button class="btn bk btn-sm no-print" onclick="exportarExcelCW()">⬇ Excel CW</button>
     </div>
@@ -898,11 +910,11 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
         <div class="fg"><label class="fl">Nombre del Sitio TSS *</label><input type="text" class="fc" id="tss-nom" placeholder="Ej: TSS_Enero_2026"></div>
         <div class="fg"><label class="fl">Fecha</label><input type="date" class="fc" id="tss-fecha"></div>
       </div>
-      <div class="fg"><label class="fl">LC / Subcontratista *</label><select class="fc" id="tss-lc"></select></div>
+      <div class="fg"><label class="fl">LC / Subcontratista Visita *</label><select class="fc" id="tss-lc"></select></div>
       <hr class="div">
-      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;margin-bottom:8px;color:var(--go)">VISITAS A REGISTRAR</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;margin-bottom:8px;color:var(--go)">ACTIVIDADES A REGISTRAR</div>
       <div id="tss-vis-cont"></div>
-      <button class="btn bou btn-sm" onclick="addTSSVisita()">＋ Agregar Visita</button>
+      <button class="btn bou btn-sm" onclick="addTSSVisita()">＋ Agregar Actividad</button>
     </div>
     <div class="mf">
       <button class="btn bou" onclick="closeModal('m-nuevo-tss')">Cancelar</button>
@@ -917,7 +929,7 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
     <div class="mh"><h3>💸 Agregar Gasto</h3><button class="mc" onclick="closeModal('m-gastos')">×</button></div>
     <div class="mb">
       <div class="g2">
-        <div class="fg"><label class="fl">Sitio *</label><select class="fc" id="g-sitio"></select></div>
+        <div class="fg"><label class="fl">Sitio *</label><select class="fc" id="g-sitio" onchange="updGastoSubSitio()"></select></div>
         <div class="fg"><label class="fl">Tipo *</label>
           <select class="fc" id="g-tipo">
             <option value="Materiales TI">Materiales TI</option>
@@ -926,6 +938,12 @@ hr.div{border:none;border-top:1px solid var(--g2);margin:10px 0}
             <option value="Adicionales">Adicionales</option>
           </select>
         </div>
+      </div>
+      <div class="fg" id="g-sub-sitio-wrap" style="display:none">
+        <label class="fl">Sub-Sitio TSS *</label>
+        <select class="fc" id="g-sub-sitio">
+          <option value="">— General —</option>
+        </select>
       </div>
       <div class="fg"><label class="fl">Descripción *</label><input type="text" class="fc" id="g-desc" placeholder="Descripción"></div>
       <div class="fg"><label class="fl">Valor (COP) *</label><input type="number" class="fc" id="g-valor" placeholder="0" min="0"></div>
@@ -1274,6 +1292,8 @@ let CAT={
       nokia:[624138,672683,728162,762836],A:[400000,400000,600000,700000],AA:[440000,440000,660000,770000],AAA:[496926,498020,596413,762909]},
     {id:'TSS_R',nombre:'TSS_R (Solo Reporte)',unidad:'Sitio',
       nokia:[510659,550377,595768,624138],A:[130000,130000,130000,130000],AA:[143000,143000,143000,143000],AAA:[242939,261834,283429,296926]},
+    {id:'TSS_RD',nombre:'TSS_RD (Rediseño)',unidad:'Sitio',
+      nokia:[0,0,0,0],A:[0,0,0,0],AA:[0,0,0,0],AAA:[0,0,0,0]},
   ],
   ADJ:[
     {id:'Pruebas_Probo',nombre:'Pruebas_Probo',unidad:'Sitio',
@@ -1711,9 +1731,10 @@ function renderConsolidado(){
   const filLCSit=(document.getElementById('fil-lc-sitios')?.value)||'';
   const filQ=((document.getElementById('fil-buscar-sitios')?.value)||'').toLowerCase().trim();
   const lcSelSit=document.getElementById('fil-lc-sitios');
-  if(lcSelSit){const cur=lcSelSit.value;const lcs=[...new Set(ST.sitios.filter(s=>matchTipoCuadrilla(s,filTC)).map(s=>s.lc).filter(Boolean))].sort();lcSelSit.innerHTML='<option value="">Todas las Cuadrillas (LC)</option>'+lcs.map(l=>`<option value="${l}" ${l===cur?'selected':''}>${l}</option>`).join('');if(cur)lcSelSit.value=cur;}
+  if(lcSelSit){const cur=lcSelSit.value;const lcs=[...new Set(ST.sitios.filter(s=>s.tipo!=='TSS'&&matchTipoCuadrilla(s,filTC)).map(s=>s.lc).filter(Boolean))].sort();lcSelSit.innerHTML='<option value="">Todos los LC</option>'+lcs.map(l=>`<option value="${l}" ${l===cur?'selected':''}>${l}</option>`).join('');if(cur)lcSelSit.value=cur;}
   let tV=0,tC=0,tTI=0,tADJ=0,tCW=0,tCR=0,tSTC=0,tSCW=0,tMTI=0,tMCW=0,tLog=0,tAd=0,tMIMOtot=0;
   const sitiosFiltrados=ST.sitios.filter(s=>{
+    if(s.tipo==='TSS') return false;
     if(!matchTipoCuadrilla(s,filTC)) return false;
     if(filLCSit&&s.lc!==filLCSit) return false;
     if(filQ&&!`${s.nombre} ${s.lc} ${s.ciudad} ${s.cat}`.toLowerCase().includes(filQ)) return false;
@@ -1773,33 +1794,66 @@ function renderConsolidado(){
 // LIQUIDADOR - DOBLE CARD (Nokia + SubC)
 // ============================================================
 function renderConsolidadoTSS(){
-  const filTC='todos';
   const filLC=(document.getElementById('tss-fil-lc')?.value)||'';
-  // Populate LC dropdown
+  const filLCRep=(document.getElementById('tss-fil-lc-rep')?.value)||'';
   const lcSel=document.getElementById('tss-fil-lc');
-  if(lcSel){const cur=lcSel.value;const lcs=[...new Set(ST.sitios.filter(s=>s.tipo==='TSS').map(s=>s.lc).filter(Boolean))].sort();lcSel.innerHTML='<option value="">Todas las Cuadrillas (LC)</option>'+lcs.map(l=>`<option value="${l}" ${l===cur?'selected':''}>${l}</option>`).join('');if(cur)lcSel.value=cur;}
-  const tss=ST.sitios.filter(s=>s.tipo==='TSS'&&matchTipoCuadrilla(s,filTC)&&(!filLC||s.lc===filLC));
-  let tV=0,tC=0;
+  if(lcSel){const cur=lcSel.value;const lcs=[...new Set(ST.sitios.filter(s=>s.tipo==='TSS').map(s=>s.lcVisita||s.lc).filter(Boolean))].sort();lcSel.innerHTML='<option value="">Todos los LC (Visita)</option>'+lcs.map(l=>`<option value="${l}" ${l===cur?'selected':''}>${l}</option>`).join('');if(cur)lcSel.value=cur;}
+  const lcRepSel=document.getElementById('tss-fil-lc-rep');
+  if(lcRepSel){const cur=lcRepSel.value;const lcs=[...new Set(ST.sitios.filter(s=>s.tipo==='TSS').map(s=>s.lcReporte).filter(Boolean))].sort();lcRepSel.innerHTML='<option value="">LC Reporte (todos)</option>'+lcs.map(l=>`<option value="${l}" ${l===cur?'selected':''}>${l}</option>`).join('');if(cur)lcRepSel.value=cur;}
+  const tss=ST.sitios.filter(s=>s.tipo==='TSS'
+    &&(!filLC||(s.lcVisita||s.lc)===filLC)
+    &&(!filLCRep||s.lcReporte===filLCRep));
+  let tVis=0,tRep=0,tRed=0,tSVis=0,tSRep=0,tSRed=0;
   const rows=tss.map(s=>{
-    const cc=calcSitio(s),sub=SUBCS.find(x=>x.lc===s.lc);
-    tV+=cc.totalVenta;tC+=cc.totalCosto;
+    const lcVisita=s.lcVisita||s.lc||'';
+    const lcReporte=s.lcReporte||s.lc||'';
+    const lcRedesign=s.lcRedesign||s.lc||'';
+    const catBaseV=SUBCS.find(x=>x.lc===lcVisita)?.cat||s.cat;
+    const catBaseR=SUBCS.find(x=>x.lc===lcReporte)?.cat||s.cat;
+    const catBaseRd=SUBCS.find(x=>x.lc===lcRedesign)?.cat||s.cat;
+    let nokiaVis=0,nokiaRep=0,nokiaRed=0,subcVis=0,subcRep=0,subcRed=0;
+    (s.actividades||[]).forEach(act=>{
+      const isNokia=act.cardType!=='subc';
+      const isSubc=act.cardType!=='nokia';
+      if(isNokia){
+        const pN=getPrecio('BASE',act.id,null,s.cat,act.ciudad);
+        const n=pN.nokia*(act.cant||0);
+        if(act.id==='TSS_V')nokiaVis+=n;
+        else if(act.id==='TSS_R')nokiaRep+=n;
+        else if(act.id==='TSS_VR'||act.id==='TSS_RD')nokiaRed+=n;
+      }
+      if(isSubc){
+        const cb=act.id==='TSS_V'?catBaseV:act.id==='TSS_R'?catBaseR:catBaseRd;
+        const pS=getPrecio('BASE',act.id,null,act.catOver||cb,act.ciudad);
+        const sc=pS.subc*(act.cant||0);
+        if(act.id==='TSS_V')subcVis+=sc;
+        else if(act.id==='TSS_R')subcRep+=sc;
+        else if(act.id==='TSS_VR'||act.id==='TSS_RD')subcRed+=sc;
+      }
+    });
+    tVis+=nokiaVis;tRep+=nokiaRep;tRed+=nokiaRed;tSVis+=subcVis;tSRep+=subcRep;tSRed+=subcRed;
     return`<tr>
-      <td style="white-space:nowrap"><strong>${s.nombre}</strong> ${tipoBadge(s)}</td>
+      <td style="white-space:nowrap"><span class="stat-link" onclick="abrirLiquidador('${s.id}')" style="cursor:pointer;font-weight:700">${s.nombre}</span> ${tipoBadge(s)}</td>
       <td style="font-size:10px">${s.fecha||'—'}</td>
-      <td style="font-size:10px">${s.lc||'—'}</td>
+      <td style="font-size:10px">${lcVisita||'—'}</td>
       <td><span class="badge bg-b" style="font-size:8px">${(s.ciudad||'').replace('Ciudad_','')}</span></td>
       <td><span class="badge bg-gl" style="font-size:8px">${s.cat||'A'}</span></td>
-      <td class="num fw7" style="color:var(--b)">${cop(cc.totalVenta)}</td>
-      <td class="num" style="color:var(--o)">${cop(cc.totalCosto)}</td>
-      <td><button class="btn bou btn-sm" onclick="abrirLiquidador('${s.id}')">Abrir</button>
-      ${(s.estado!=='final')?'<button class="btn-del" onclick="eliminarSitio(\''+s.id+'\')">✕</button>':''}</td>
+      <td class="num">${new Set((s.actividades||[]).map(a=>a.sitioid).filter(Boolean)).size||0}</td>
+      <td class="num" style="color:var(--b)">${nokiaVis>0?cop(nokiaVis):'—'}</td>
+      <td class="num" style="color:var(--b)">${nokiaRep>0?cop(nokiaRep):'—'}</td>
+      <td class="num" style="color:var(--b)">${nokiaRed>0?cop(nokiaRed):'—'}</td>
+      <td class="num" style="color:var(--o)">${subcVis>0?cop(subcVis):'—'}</td>
+      <td class="num" style="color:var(--o)">${subcRep>0?cop(subcRep):'—'}</td>
+      <td class="num" style="color:var(--o)">${subcRed>0?cop(subcRed):'—'}</td>
+      <td>${(s.estado!=='final')?'<button class="btn-del" onclick="eliminarSitio(\''+s.id+'\')">✕</button>':''}</td>
     </tr>`;
   }).join('');
-  document.getElementById('tbody-tss-cons').innerHTML=rows||'<tr><td colspan="8" class="tm" style="padding:20px;text-align:center">Sin sitios TSS</td></tr>';
-  const tU=tV-tC,tM=tV>0?tU/tV:0;
+  document.getElementById('tbody-tss-cons').innerHTML=rows||'<tr><td colspan="13" class="tm" style="padding:20px;text-align:center">Sin sitios TSS</td></tr>';
   document.getElementById('tfoot-tss-cons').innerHTML=`<tr class="tr-tot">
-    <td colspan="5"><strong>TOTAL TSS</strong></td>
-    <td class="num fw8">${cop(tV)}</td><td class="num fw8">${cop(tC)}</td><td></td>
+    <td colspan="6"><strong>TOTAL TSS</strong></td>
+    <td class="num fw8">${cop(tVis)}</td><td class="num fw8">${cop(tRep)}</td><td class="num fw8">${cop(tRed)}</td>
+    <td class="num fw8">${cop(tSVis)}</td><td class="num fw8">${cop(tSRep)}</td><td class="num fw8">${cop(tSRed)}</td>
+    <td></td>
   </tr>`;
 }
 function initSelLiq(){
@@ -1952,7 +2006,7 @@ function renderLiqSitio(sitio){
   const actRowsSubc=buildActTable(sitio,c,'subc');
 
   const addBtn=sitio.estado==='final'?'':`<button class="btn btn-sm no-print" style="background:#CDFBF2;color:#000000;font-weight:700" onclick="openAddAct('${sitio.id}')">＋ Actividad</button>`;
-  const addBtnSubc=sitio.estado==='final'?'':`<button class="btn btn-sm no-print" style="background:#FFC000;color:#000000;font-weight:700" onclick="openAddAct('${sitio.id}')">＋ Actividad</button>`;
+  const lcNameSubc=`<span style="font-weight:700;color:#000;font-size:11px;margin-left:auto;text-align:right;line-height:1.2">${sitio.lc||''}<br><span style="font-weight:400;font-size:9px;color:var(--g4)">Cat ${sitio.catEfectiva||sitio.cat||'A'}</span></span>`;
 
   // CW card — auto-llena desde liquidación CW
   const _liqCW=getLiqCW(sitio.id);
@@ -2121,7 +2175,7 @@ function renderLiqSitio(sitio){
       <!-- SUBC CARD -->
       <div>
         <div class="card subc-card">
-          <div class="card-h" style="color:#000"><h2>SUBCONTRATISTA — Liquidación Pago</h2>${addBtnSubc}</div>
+          <div class="card-h" style="color:#000"><h2>SUBC — Liquidación Pago</h2>${lcNameSubc}</div>
           <div style="padding:0;overflow-x:auto">
             <table class="tbl tbl-subc">
               <thead><tr>
@@ -2139,93 +2193,274 @@ function renderLiqSitio(sitio){
 }
 
 function renderLiqTSS(sitio){
-  const c=calcSitio(sitio);
-  const mc2=c.margen>=.3?'#1a7a1a':c.margen>=.2?'#FFC000':'#c0392b';
-  const rowsN=sitio.actividades.map((act,i)=>{
+  const lcVisita=sitio.lcVisita||sitio.lc||'';
+  const lcReporte=sitio.lcReporte||sitio.lc||'';
+  const lcRedesign=sitio.lcRedesign||sitio.lc||'';
+  const catBaseV=SUBCS.find(x=>x.lc===lcVisita)?.cat||sitio.cat;
+  const catBaseR=SUBCS.find(x=>x.lc===lcReporte)?.cat||sitio.cat;
+  const catBaseRd=SUBCS.find(x=>x.lc===lcRedesign)?.cat||sitio.cat;
+  const isFinal=sitio.estado==='final';
+
+  // Gastos adicionales vinculados a un sub-sitio específico
+  const adicForSitio=(sitioid)=>ST.gastos.filter(g=>g.sitio===sitio.id&&g.sub_sitio===sitioid).reduce((s,g)=>s+(g.valor||0),0);
+
+  // Totals: Nokia = cardType!=='subc'; SubC = cardType!=='nokia' (soporta legado sin cardType)
+  let nokiaVis=0,nokiaRep=0,nokiaRed=0,subcVis=0,subcRep=0,subcRed=0;
+  (sitio.actividades||[]).forEach(act=>{
+    const isNokia=act.cardType!=='subc';
+    const isSubc=act.cardType!=='nokia';
+    if(isNokia){
+      const pN=getPrecio('BASE',act.id,null,sitio.cat,act.ciudad);
+      const n=pN.nokia*(act.cant||0);
+      if(act.id==='TSS_V')nokiaVis+=n;
+      else if(act.id==='TSS_R')nokiaRep+=n;
+      else if(act.id==='TSS_VR'||act.id==='TSS_RD')nokiaRed+=n;
+    }
+    if(isSubc){
+      const cb=act.id==='TSS_V'?catBaseV:act.id==='TSS_R'?catBaseR:catBaseRd;
+      const pS=getPrecio('BASE',act.id,null,act.catOver||cb,act.ciudad);
+      const sc=pS.subc*(act.cant||0);
+      if(act.id==='TSS_V')subcVis+=sc;
+      else if(act.id==='TSS_R')subcRep+=sc;
+      else if(act.id==='TSS_VR'||act.id==='TSS_RD')subcRed+=sc;
+    }
+  });
+  const totalNokia=nokiaVis+nokiaRep+nokiaRed;
+  const totalSubc=subcVis+subcRep+subcRed;
+  const utilidad=totalNokia-totalSubc;
+  const margen=totalNokia>0?utilidad/totalNokia:0;
+  const mc2=margen>=.3?'#1a7a1a':margen>=.2?'#FFC000':'#c0392b';
+
+  // ── Sub-sitios disponibles para selector ──
+  const allSitioids=[...new Set((sitio.actividades||[]).map(a=>a.sitioid).filter(Boolean))].sort();
+  const mkSitioidSel=(curr,sid,idx,w='90px')=>`<select class="fc" style="font-size:10px;padding:2px 3px;max-width:${w}" onchange="updTSSAct('${sid}',${idx},'sitioid',this.value)"><option value="" ${!curr?'selected':''}>— Sin sitio —</option>${allSitioids.map(s=>`<option value="${s}" ${curr===s?'selected':''}>${s}</option>`).join('')}</select>`;
+
+  // ── Nokia table (solo actividades Nokia / legado) ──
+  const TSS_TIPOS=['TSS_V','TSS_R','TSS_VR','TSS_RD'];
+  const nokiaActs=(sitio.actividades||[]).map((a,i)=>({...a,_idx:i})).filter(a=>a.cardType!=='subc');
+  const rowsN=nokiaActs.map(act=>{
     const p=getPrecio('BASE',act.id,null,sitio.cat,act.ciudad);
+    const isEditing=!isFinal&&_tssEditKey===`${sitio.id}_${act._idx}`;
+    if(isEditing){
+      const sitioidCell=act.id==='TSS_RD'
+        ?mkSitioidSel(act.sitioid,sitio.id,act._idx,'90px')
+        :`<input class="iq" type="text" value="${act.sitioid||''}" style="width:80px;font-size:10px" oninput="updTSSAct('${sitio.id}',${act._idx},'sitioid',this.value)">`;
+      return`<tr style="background:#f0f7ff">
+        <td><select class="fc" style="font-size:9px;padding:2px 4px" onchange="updTSSAct('${sitio.id}',${act._idx},'id',this.value)">${TSS_TIPOS.map(t=>`<option value="${t}" ${act.id===t?'selected':''}>${t}</option>`).join('')}</select></td>
+        <td>${sitioidCell}</td>
+        <td><select class="fc" style="font-size:10px;padding:2px 4px" onchange="updTSSAct('${sitio.id}',${act._idx},'ciudad',this.value)">${ZONAS.map(z=>`<option value="${z}" ${act.ciudad===z?'selected':''}>${z.replace('Ciudad_','')}</option>`).join('')}</select></td>
+        <td><input class="iq" type="number" value="${act.cant||0}" min="0" style="width:50px" onchange="updTSSAct('${sitio.id}',${act._idx},'cant',this.value)"></td>
+        <td class="num">${cop(p.nokia)}</td>
+        <td class="num fw7">${cop(p.nokia*(act.cant||0))}</td>
+        <td class="no-print" style="white-space:nowrap">
+          <button class="btn-edit" onclick="toggleTSSEdit('${sitio.id}',${act._idx})" title="Cerrar">✓</button>
+          <button class="btn-del" onclick="delTSSAct('${sitio.id}',${act._idx})">✕</button>
+        </td>
+      </tr>`;
+    }
     return`<tr>
-      <td><span class="badge bg-b">${act.id}</span></td>
-      <td>${act.sitioid||'—'}</td>
-      <td><select class="fc" style="font-size:10px;padding:2px 5px" onchange="updTSSAct('${sitio.id}',${i},'ciudad',this.value)">
-        ${ZONAS.map(z=>`<option value="${z}" ${act.ciudad===z?'selected':''}>${z.replace('Ciudad_','')}</option>`).join('')}
-      </select></td>
-      <td><input class="iq" type="number" value="${act.cant||0}" min="0"
-        onchange="updTSSAct('${sitio.id}',${i},'cant',this.value)"></td>
+      <td><span class="badge bg-b" style="font-size:9px">${act.id}</span></td>
+      <td style="font-size:11px">${act.sitioid||'—'}</td>
+      <td style="font-size:10px">${(act.ciudad||'').replace('Ciudad_','')}</td>
+      <td style="font-weight:600;text-align:center">${act.cant||0}</td>
       <td class="num">${cop(p.nokia)}</td>
       <td class="num fw7">${cop(p.nokia*(act.cant||0))}</td>
-      <td><button class="btn-del" onclick="delTSSAct('${sitio.id}',${i})">✕</button></td>
+      <td class="no-print" style="white-space:nowrap">${isFinal?'':`<button class="btn-edit" onclick="toggleTSSEdit('${sitio.id}',${act._idx})" title="Editar">${IC_PEN}</button><button class="btn-del" onclick="delTSSAct('${sitio.id}',${act._idx})">✕</button>`}</td>
     </tr>`;
   }).join('');
-  const rowsS=sitio.actividades.map((act,i)=>{
-    const p=getPrecio('BASE',act.id,null,sitio.cat,act.ciudad);
-    return`<tr>
-      <td><span class="badge bg-b">${act.id}</span></td>
-      <td>${act.sitioid||'—'}</td>
-      <td style="font-size:10px">${act.ciudad?.replace('Ciudad_','')||'—'}</td>
-      <td class="num">${act.cant||0}</td>
-      <td class="num">${cop(p.subc)}</td>
-      <td class="num fw7">${cop(p.subc*(act.cant||0))}</td>
+  // Inline form to add Nokia activity
+  const addNokiaForm=(!isFinal&&_tssAddNokiaSid===sitio.id)?`
+    <tr style="background:#e8f4ff">
+      <td><select id="tss-add-tipo-${sitio.id}" class="fc" style="font-size:9px;padding:2px 4px" onchange="toggleTSSAddSitioField('${sitio.id}',this.value)">${TSS_TIPOS.map(t=>`<option value="${t}">${t}</option>`).join('')}</select></td>
+      <td>
+        <input id="tss-add-sitio-inp-${sitio.id}" class="iq" type="text" placeholder="Nombre sitio" style="width:90px;font-size:10px">
+        <select id="tss-add-sitio-sel-${sitio.id}" class="fc" style="display:none;font-size:10px;padding:2px 3px;max-width:100px"><option value="">— Sin sitio —</option>${allSitioids.map(s=>`<option value="${s}">${s}</option>`).join('')}</select>
+      </td>
+      <td><select id="tss-add-ciudad-${sitio.id}" class="fc" style="font-size:10px;padding:2px 4px">${ZONAS.map(z=>`<option value="${z}" ${(sitio.ciudad||'Ciudad_Principal')===z?'selected':''}>${z.replace('Ciudad_','')}</option>`).join('')}</select></td>
+      <td><input id="tss-add-cant-${sitio.id}" class="iq" type="number" value="1" min="1" style="width:50px"></td>
+      <td colspan="2" style="text-align:center">
+        <button class="btn bp btn-sm" style="font-size:9px;padding:2px 7px" onclick="confirmarAddNokiaTSS('${sitio.id}')">✓ Agregar</button>
+        <button class="btn bou btn-sm" style="font-size:9px;padding:2px 7px;margin-left:4px" onclick="addTSSVisitaToSitio('${sitio.id}')">✕</button>
+      </td>
       <td></td>
-    </tr>`;
-  }).join('');
+    </tr>`:'';
+
+
+  // ── SUBC card builder con CAT por fila ──
+  const makeSubcCard=(typeIds,lcField,catBase,label,showAdicionales,addableIds)=>{
+    const _addIds=addableIds||typeIds; // IDs permitidos en botón ＋ (puede excluir TSS_VR)
+    const acts=(sitio.actividades||[]).map((a,i)=>({...a,_idx:i})).filter(a=>typeIds.includes(a.id)&&a.cardType!=='nokia');
+    let cardTotal=0,totalAdic=0;
+    const subcRows=acts.map(act=>{
+      const effCat=act.catOver||catBase;
+      const p=getPrecio('BASE',act.id,null,effCat,act.ciudad);
+      const subc=p.subc*(act.cant||0);
+      const adic=showAdicionales?adicForSitio(act.sitioid):0;
+      const rowTotal=subc+adic;
+      cardTotal+=rowTotal;
+      if(showAdicionales)totalAdic+=adic;
+      const catOpts=catBase==='A'?['AA','AAA']:catBase==='AA'?['AAA']:[];
+      const isEditing=!isFinal&&_tssEditKey===`${sitio.id}_${act._idx}`;
+      if(isEditing){
+        const catSel=`<select class="fc" style="font-size:9px;max-width:72px;border:2px solid #7c3aed;padding:1px 2px" onchange="updTSSAct('${sitio.id}',${act._idx},'catOver',this.value)"><option value="" ${!act.catOver?'selected':''}>Cat ${catBase}${catBase==='AAA'?'★':''}</option>${catOpts.map(o=>`<option value="${o}" ${act.catOver===o?'selected':''}>→${o}⭐</option>`).join('')}</select>`;
+        const subcSitioidCell=act.id==='TSS_RD'
+          ?mkSitioidSel(act.sitioid,sitio.id,act._idx,'80px')
+          :`<input class="iq" type="text" value="${act.sitioid||''}" style="width:70px;font-size:10px" oninput="updTSSAct('${sitio.id}',${act._idx},'sitioid',this.value)">`;
+        return`<tr style="background:#f0f7ff">
+          <td><span class="badge bg-b" style="font-size:8px">${act.id}</span></td>
+          <td>${subcSitioidCell}</td>
+          <td><select class="fc" style="font-size:9px;padding:1px 3px" onchange="updTSSAct('${sitio.id}',${act._idx},'ciudad',this.value)">${ZONAS.map(z=>`<option value="${z}" ${act.ciudad===z?'selected':''}>${z.replace('Ciudad_','')}</option>`).join('')}</select></td>
+          <td>${catSel}</td>
+          <td><input class="iq" type="number" value="${act.cant||0}" min="0" style="width:45px" onchange="updTSSAct('${sitio.id}',${act._idx},'cant',this.value)"></td>
+          <td class="num">${cop(p.subc)}</td>
+          ${showAdicionales?`<td class="num" style="color:var(--o)">${adic>0?cop(adic):'—'}</td>`:''}
+          <td class="num fw7">${cop(rowTotal)}</td>
+          <td class="no-print" style="white-space:nowrap">
+            <button class="btn-edit" onclick="toggleTSSEdit('${sitio.id}',${act._idx})" title="Listo">✓</button>
+            <button class="btn-del" onclick="delTSSAct('${sitio.id}',${act._idx})">✕</button>
+          </td>
+        </tr>`;
+      }
+      const catBadge=`<span class="badge bg-gl" style="font-size:9px">${effCat}</span>`;
+      return`<tr>
+        <td><span class="badge bg-b" style="font-size:8px">${act.id}</span></td>
+        <td style="font-size:10px">${act.sitioid||'—'}</td>
+        <td style="font-size:9px">${(act.ciudad||'').replace('Ciudad_','').substring(0,3)}</td>
+        <td>${catBadge}</td>
+        <td style="text-align:center">${act.cant||0}</td>
+        <td class="num">${cop(p.subc)}</td>
+        ${showAdicionales?`<td class="num" style="color:var(--o)">${adic>0?cop(adic):'—'}</td>`:''}
+        <td class="num fw7">${cop(rowTotal)}</td>
+        <td class="no-print" style="white-space:nowrap">${isFinal?'':`<button class="btn-edit" onclick="toggleTSSEdit('${sitio.id}',${act._idx})" title="Editar">${IC_PEN}</button><button class="btn-del" onclick="delTSSAct('${sitio.id}',${act._idx})">✕</button>`}</td>
+      </tr>`;
+    }).join('');
+    const colCount=showAdicionales?9:8;
+    const emptyRow=`<tr><td colspan="${colCount}" class="tm" style="padding:8px;text-align:center;font-size:10px">Sin actividades</td></tr>`;
+    const lcVal=sitio[lcField]||'';
+    const addBtns=!isFinal?_addIds.map(t=>`<button class="btn bou btn-sm no-print" style="font-size:9px;padding:2px 5px" onclick="addTSSSubcActToSitio('${sitio.id}','${t}')">＋${t}</button>`).join(' '):'';
+    return`<div class="card subc-card">
+      <div class="card-h" style="flex-wrap:wrap;gap:4px;align-items:flex-start">
+        <h2 style="flex:1;min-width:100px;font-size:13px">${label}</h2>
+        <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end">
+          <select class="fc" style="font-size:10px;padding:2px 5px;max-width:150px" onchange="updSitio('${sitio.id}','${lcField}',this.value)">
+            <option value="">— Sin LC —</option>
+            ${SUBCS.map(s=>`<option value="${s.lc}" ${lcVal===s.lc?'selected':''}>${s.lc}</option>`).join('')}
+          </select>
+          ${addBtns}
+        </div>
+      </div>
+      <div style="padding:0;overflow-x:auto"><table class="tbl">
+        <thead><tr>
+          <th>Tipo</th><th>Sitio</th><th>Ciudad</th><th>CAT</th><th>Cant</th>
+          <th class="num th-subc">P.SubC</th>
+          ${showAdicionales?'<th class="num th-subc" style="background:#fff3cd!important;color:#856404!important">Adicional</th>':''}
+          <th class="num th-subc">Total</th>
+          <th class="no-print"></th>
+        </tr></thead>
+        <tbody>${subcRows||emptyRow}</tbody>
+        <tfoot><tr class="tr-tot">
+          <td colspan="6"><strong>Total SubC</strong></td>
+          ${showAdicionales?`<td class="num fw7" style="color:var(--o)">${totalAdic>0?cop(totalAdic):'—'}</td>`:''}
+          <td class="num fw8">${cop(cardTotal)}</td>
+          <td></td>
+        </tr></tfoot>
+      </table></div>
+    </div>`;
+  };
+
+  // ── Gastos card ──
+  const gastosSitio=ST.gastos.filter(g=>g.sitio===sitio.id);
+  const gastosRows=gastosSitio.length?gastosSitio.map(g=>{
+    const gi=ST.gastos.indexOf(g);
+    return`<tr>
+      <td style="font-size:10px;font-weight:600">${g.sub_sitio||'General'}</td>
+      <td><span class="badge bg-o" style="font-size:9px">${g.tipo}</span></td>
+      <td style="font-size:10px">${g.desc}</td>
+      <td class="num">${cop(g.valor)}</td>
+      <td style="white-space:nowrap">
+        <button class="btn-edit" onclick="editarGasto(${gi},'${sitio.id}')" title="Editar">${IC_PEN}</button>
+        <button class="btn-del" onclick="eliminarGasto(${gi});cargarSitio('${sitio.id}')">✕</button>
+      </td></tr>`;
+  }).join(''):'<tr><td colspan="5" style="text-align:center;color:var(--g3);padding:10px;font-size:10px">Sin gastos</td></tr>';
+
   document.getElementById('liq-content').innerHTML=`
     <div class="card" style="margin-bottom:10px">
-      <div class="card-h"><h2>${sitio.nombre} — TSS</h2><span class="badge bg-b">Technical Site Survey</span></div>
-      <div class="card-b">
-        <div class="g2">
-          <div class="fg mb0"><label class="fl">LC</label>
-            <select class="fc" onchange="updSitio('${sitio.id}','lc',this.value)">
-              ${SUBCS.map(s=>`<option value="${s.lc}" ${sitio.lc===s.lc?'selected':''}>${s.lc}</option>`).join('')}
-            </select></div>
-          <div class="fg mb0"><label class="fl">Fecha</label>
-            <input type="date" class="fc" value="${sitio.fecha}" onchange="updSitio('${sitio.id}','fecha',this.value)">
+      <div class="card-h" style="flex-wrap:wrap;gap:6px;align-items:center">
+        <h2 style="margin:0">${sitio.nombre} — TSS</h2>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          ${isFinal
+            ?`<span class="badge" style="background:#1a7a1a;color:#fff;padding:2px 10px;font-size:11px">FINAL</span>
+               <button class="btn bou btn-sm no-print" style="padding:2px 10px;min-width:0;font-size:11px;line-height:1.4" onclick="updSitio('${sitio.id}','estado','pre');cargarSitio('${sitio.id}')">↩ A PRE</button>`
+            :`<span class="badge" style="background:#d68910;color:#fff;padding:2px 10px;font-size:11px">PRE</span>
+               <button class="btn bp btn-sm no-print" style="padding:2px 10px;min-width:0;font-size:11px;line-height:1.4" onclick="updSitio('${sitio.id}','estado','final');cargarSitio('${sitio.id}')">✓ Marcar FINAL</button>`
+          }
+          <input type="date" class="fc" value="${sitio.fecha}" onchange="updSitio('${sitio.id}','fecha',this.value)" style="width:140px">
+        </div>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:14px;margin-bottom:14px">
+      <div class="card nokia-card">
+        <div class="card-h">
+          <h2>NOKIA — Liquidación TSS</h2>
+          ${!isFinal?`<button class="btn bo btn-sm no-print" onclick="addTSSVisitaToSitio('${sitio.id}')">＋ Actividad</button>`:''}
+        </div>
+        <div style="padding:0;overflow-x:auto"><table class="tbl">
+          <thead><tr>
+            <th>Tipo</th><th>Sitio ID</th><th>Ciudad</th><th>Cant</th>
+            <th class="num th-nokia">P.Nokia</th><th class="num th-nokia">Total Nokia</th>
+            <th class="no-print"></th>
+          </tr></thead>
+          <tbody>${rowsN||''}${addNokiaForm||''}${(!rowsN&&!addNokiaForm)?'<tr><td colspan="7" class="tm" style="padding:16px;text-align:center">Sin actividades — usa ＋ Actividad</td></tr>':''}</tbody>
+          <tfoot><tr class="tr-tot">
+            <td colspan="5"><strong>Total Nokia</strong></td>
+            <td class="num fw8">${cop(totalNokia)}</td><td></td>
+          </tr></tfoot>
+        </table></div>
+      </div>
+      <div class="card">
+        <div class="card-h"><h2>Resumen TSS</h2></div>
+        <div class="card-b">
+          <table style="width:100%;font-size:11px">
+            <tr><td style="color:var(--b)">Nokia Visita</td><td style="text-align:right;font-weight:600;color:var(--b)">${cop(nokiaVis)}</td></tr>
+            <tr><td style="color:var(--b)">Nokia Reporte</td><td style="text-align:right;font-weight:600;color:var(--b)">${cop(nokiaRep)}</td></tr>
+            <tr><td style="color:var(--b)">Nokia Rediseño</td><td style="text-align:right;font-weight:600;color:var(--b)">${cop(nokiaRed)}</td></tr>
+            <tr><td colspan="2"><hr class="div"></td></tr>
+            <tr><td style="color:var(--b);font-weight:800">VENTA NOKIA</td><td style="text-align:right;font-weight:800;font-size:14px;color:var(--b)">${cop(totalNokia)}</td></tr>
+            <tr><td colspan="2"><hr class="div"></td></tr>
+            <tr><td style="color:#856404">SubC Visita</td><td style="text-align:right;font-weight:600;color:#856404">${cop(subcVis)}</td></tr>
+            <tr><td style="color:#856404">SubC Reporte</td><td style="text-align:right;font-weight:600;color:#856404">${cop(subcRep)}</td></tr>
+            <tr><td style="color:#856404">SubC Rediseño</td><td style="text-align:right;font-weight:600;color:#856404">${cop(subcRed)}</td></tr>
+            <tr><td colspan="2"><hr class="div"></td></tr>
+            <tr><td style="font-weight:800">UTILIDAD</td><td style="text-align:right;font-weight:800;font-size:18px;color:${mc2}">${cop(utilidad)}</td></tr>
+          </table>
+          <div style="margin-top:8px">
+            <div class="fb" style="margin-bottom:2px"><span style="font-size:10px;font-weight:700">% MARGEN</span><span style="font-size:16px;font-weight:800;color:${mc2}">${pct(margen)}</span></div>
+            <div class="mbar"><div class="mfill ${mfcls(margen)}" style="width:${Math.min(margen*100,100)}%"></div></div>
           </div>
         </div>
       </div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      <div class="card nokia-card">
-        <div class="card-h"><h2>NOKIA — Liquidación TSS</h2>
-          <button class="btn bo btn-sm no-print" onclick="addTSSVisitaToSitio('${sitio.id}')">＋ Visita</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      ${makeSubcCard(['TSS_V'],'lcVisita',catBaseV,'SUBC — VISITA',true,[])}
+      ${makeSubcCard(['TSS_R'],'lcReporte',catBaseR,'SUBC — REPORTE',false,[])}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px">
+      ${makeSubcCard(['TSS_VR','TSS_RD'],'lcRedesign',catBaseRd,'SUBC — REDISEÑO',false,['TSS_RD'])}
+      <div class="card">
+        <div class="card-h" style="background:#FFF0CE;border-left-color:#FFC000;color:#000;display:flex;justify-content:space-between;align-items:center">
+          <h2>Gastos Registrados</h2>
+          <button class="btn bd no-print" style="margin-left:auto;border-radius:20px;font-weight:700" onclick="openGastoFor('${sitio.id}')">＋ Agregar Gasto</button>
         </div>
-        <div style="padding:0;overflow-x:auto">
-          <table class="tbl">
-            <thead><tr><th>Tipo</th><th>Sitio</th><th>Ciudad</th><th>Cant</th>
-              <th class="num th-nokia">P. Nokia</th><th class="num th-nokia">Total Nokia</th><th></th></tr></thead>
-            <tbody>${rowsN}</tbody>
-            <tfoot><tr class="tr-tot"><td colspan="5"><strong>Total Nokia</strong></td>
-              <td class="num">${cop(c.nokiaTI)}</td><td></td></tr></tfoot>
-          </table>
-        </div>
-      </div>
-      <div>
-        <div class="card subc-card">
-          <div class="card-h"><h2>SUBCONTRATISTA — Pago TSS</h2></div>
-          <div style="padding:0;overflow-x:auto">
-            <table class="tbl">
-              <thead><tr><th>Tipo</th><th>Sitio</th><th>Ciudad</th><th>Cant</th>
-                <th class="num th-subc">P. SubC</th><th class="num th-subc">Total SubC</th><th></th></tr></thead>
-              <tbody>${rowsS}</tbody>
-              <tfoot><tr class="tr-tot"><td colspan="5"><strong>Total SubC</strong></td>
-                <td class="num">${cop(c.subcTI)}</td><td></td></tr></tfoot>
-            </table>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-h"><h2>Resumen TSS</h2></div>
-          <div class="card-b">
-            <table style="width:100%;font-size:11px">
-              <tr><td style="color:var(--b);font-weight:700">Venta Nokia</td><td style="text-align:right;font-weight:800;color:var(--b)">${cop(c.nokiaTI)}</td></tr>
-              <tr><td style="color:#856404">Pago SubC</td><td style="text-align:right;font-weight:700;color:#856404">${cop(c.subcTI)}</td></tr>
-              <tr><td colspan="2"><hr class="div"></td></tr>
-              <tr><td style="font-weight:800">UTILIDAD</td><td style="text-align:right;font-weight:800;font-size:18px;color:${mc2}">${cop(c.utilidad)}</td></tr>
-            </table>
-            <div style="margin-top:8px">
-              <div class="fb" style="margin-bottom:2px"><span style="font-size:10px;font-weight:700">% MARGEN</span><span style="font-size:16px;font-weight:800;color:${mc2}">${pct(c.margen)}</span></div>
-              <div class="mbar"><div class="mfill ${mfcls(c.margen)}" style="width:${Math.min(c.margen*100,100)}%"></div></div>
-            </div>
-          </div>
-        </div>
+        <div style="padding:0"><table class="tbl">
+          <thead><tr style="background:#FFD36C">
+            <th style="background:#FFD36C!important;color:#000!important">Sitio</th>
+            <th style="background:#FFD36C!important;color:#000!important">Tipo</th>
+            <th style="background:#FFD36C!important;color:#000!important">Desc</th>
+            <th class="num" style="background:#FFD36C!important;color:#000!important">Valor</th>
+            <th style="background:#FFD36C!important"></th>
+          </tr></thead>
+          <tbody>${gastosRows}</tbody>
+        </table></div>
       </div>
     </div>`;
 }
@@ -2435,10 +2670,66 @@ function updTSSAct(sid,idx,f,val){
   const s=ST.sitios.find(x=>x.id===sid);
   if(s&&s.actividades[idx]){if(f==='cant')s.actividades[idx].cant=parseFloat(val)||0;else s.actividades[idx][f]=val;saveState();renderLiqTSS(s)}
 }
-function delTSSAct(sid,idx){const s=ST.sitios.find(x=>x.id===sid);if(s){s.actividades.splice(idx,1);saveState();renderLiqTSS(s)}}
+function delTSSAct(sid,idx){
+  const s=ST.sitios.find(x=>x.id===sid);if(!s)return;
+  const act=s.actividades[idx];
+  if(act&&act.cardType!=='subc'){
+    // Cascade: remove matching SUBC activities with same sitioid
+    const sitioid=act.sitioid;
+    const toRemove=new Set();
+    if(act.id==='TSS_V'||act.id==='TSS_VR')
+      s.actividades.forEach((a,i)=>{if(a.cardType!=='nokia'&&a.id==='TSS_V'&&a.sitioid===sitioid)toRemove.add(i);});
+    if(act.id==='TSS_R'||act.id==='TSS_VR')
+      s.actividades.forEach((a,i)=>{if(a.cardType!=='nokia'&&a.id==='TSS_R'&&a.sitioid===sitioid)toRemove.add(i);});
+    if(act.id==='TSS_RD')
+      s.actividades.forEach((a,i)=>{if(a.cardType!=='nokia'&&a.id==='TSS_RD'&&a.sitioid===sitioid)toRemove.add(i);});
+    toRemove.add(idx);
+    s.actividades=s.actividades.filter((_,i)=>!toRemove.has(i));
+  } else {
+    s.actividades.splice(idx,1);
+  }
+  _tssEditKey='';saveState();renderLiqTSS(s);
+}
 function addTSSVisitaToSitio(sid){
+  _tssAddNokiaSid=(_tssAddNokiaSid===sid)?'':sid;
+  const s=ST.sitios.find(x=>x.id===sid);if(s)renderLiqTSS(s);
+}
+function addTSSSubcActToSitio(sid,actId){
   const s=ST.sitios.find(x=>x.id===sid);
-  if(s){s.actividades.push({sec:'TSS',tipo:'BASE',id:'TSS_V',ciudad:'Ciudad_Secundaria',sitioid:'',cant:1});saveState();renderLiqTSS(s)}
+  if(s){s.actividades.push({sec:'TSS',tipo:'BASE',id:actId,ciudad:s.ciudad||'Ciudad_Principal',sitioid:'',cant:1,catOver:'',cardType:'subc'});saveState();renderLiqTSS(s)}
+}
+let _tssEditKey=''; // 'sitioId_actIdx'
+let _tssAddNokiaSid=''; // sitio mostrando formulario inline
+function toggleTSSEdit(sid,idx){
+  const key=`${sid}_${idx}`;
+  _tssEditKey=(_tssEditKey===key)?'':key;
+  const s=ST.sitios.find(x=>x.id===sid);if(s)renderLiqTSS(s);
+}
+function toggleTSSAddSitioField(sid,tipo){
+  const inp=document.getElementById(`tss-add-sitio-inp-${sid}`);
+  const sel=document.getElementById(`tss-add-sitio-sel-${sid}`);
+  if(!inp||!sel)return;
+  if(tipo==='TSS_RD'){inp.style.display='none';sel.style.display='';}
+  else{sel.style.display='none';inp.style.display='';}
+}
+function confirmarAddNokiaTSS(sid){
+  const tipo=document.getElementById(`tss-add-tipo-${sid}`)?.value;
+  const inp=document.getElementById(`tss-add-sitio-inp-${sid}`);
+  const sel=document.getElementById(`tss-add-sitio-sel-${sid}`);
+  const sitioid=(tipo==='TSS_RD'?sel?.value:inp?.value)?.trim()||'';
+  const ciudad=document.getElementById(`tss-add-ciudad-${sid}`)?.value||'Ciudad_Principal';
+  const cant=parseFloat(document.getElementById(`tss-add-cant-${sid}`)?.value)||1;
+  const s=ST.sitios.find(x=>x.id===sid);
+  if(!s||!tipo){toast('Selecciona un tipo','err');return;}
+  s.actividades.push({sec:'TSS',tipo:'BASE',id:tipo,ciudad,sitioid,cant,catOver:'',cardType:'nokia'});
+  if(tipo==='TSS_V'||tipo==='TSS_VR')
+    s.actividades.push({sec:'TSS',tipo:'BASE',id:'TSS_V',ciudad,sitioid,cant,catOver:'',cardType:'subc'});
+  if(tipo==='TSS_R'||tipo==='TSS_VR')
+    s.actividades.push({sec:'TSS',tipo:'BASE',id:'TSS_R',ciudad,sitioid,cant,catOver:'',cardType:'subc'});
+  if(tipo==='TSS_RD')
+    s.actividades.push({sec:'TSS',tipo:'BASE',id:'TSS_RD',ciudad,sitioid,cant,catOver:'',cardType:'subc'});
+  _tssAddNokiaSid='';
+  saveState();renderLiqTSS(s);toast('Actividad agregada');
 }
 function updSitio(id,field,val){
   const s=ST.sitios.find(x=>x.id===id);if(!s)return;
@@ -2603,12 +2894,18 @@ async function loadFromSupabase(){
       tiene_cw:row.tiene_cw||false, cw_nokia:row.cw_nokia||0,
       cw_costo:row.cw_costo||0, cw_conjunto:row.cw_conjunto||false,
       estado:row.estado||'pre',
+      lcVisita:row.lc_visita||row.lc||'',
+      lcReporte:row.lc_reporte||'',
+      lcRedesign:row.lc_redesign||'',
+      catOverVisita:row.cat_over_visita||'',
+      catOverReporte:row.cat_over_reporte||'',
+      catOverRedesign:row.cat_over_redesign||'',
       costos:row.costos||{}, actividades:row.actividades||[],
       crSubcExcluded:row.cr_subc_excluded||[]
     }));
     ST.gastos=(gastosData||[]).map(row=>({
       sitio:row.sitio_id, tipo:row.tipo||'',
-      desc:row.descripcion||'', valor:row.valor||0
+      desc:row.descripcion||'', valor:row.valor||0, sub_sitio:row.sub_sitio||''
     }));
     toast('✓ Sincronizado con Supabase ('+ST.sitios.length+' sitios)');
     return true;
@@ -2629,7 +2926,13 @@ async function syncToSupabase(){
       cw_costo:s.cw_costo||0, cw_conjunto:s.cw_conjunto||false,
       estado:s.estado||'pre', costos:s.costos||{},
       actividades:s.actividades||[],
-      cr_subc_excluded:s.crSubcExcluded||[]
+      cr_subc_excluded:s.crSubcExcluded||[],
+      lc_visita:s.lcVisita||null,
+      lc_reporte:s.lcReporte||null,
+      lc_redesign:s.lcRedesign||null,
+      cat_over_visita:s.catOverVisita||null,
+      cat_over_reporte:s.catOverReporte||null,
+      cat_over_redesign:s.catOverRedesign||null
     }));
     const {error:eS}=await supa.from('sitios').upsert(sitiosData,{onConflict:'id'});
     if(eS){console.warn('Supabase sitios error:',eS.message);toast('Error Supabase: '+eS.message,'err');return;}
@@ -2637,7 +2940,7 @@ async function syncToSupabase(){
     await supa.from('gastos').delete().in('sitio_id',siteIds);
     if(ST.gastos.length>0){
       const gastosData=ST.gastos.map(g=>({
-        sitio_id:g.sitio, tipo:g.tipo||'', descripcion:g.desc||'', valor:g.valor||0
+        sitio_id:g.sitio, tipo:g.tipo||'', descripcion:g.desc||'', valor:g.valor||0, sub_sitio:g.sub_sitio||null
       }));
       await supa.from('gastos').insert(gastosData);
     }
@@ -3029,7 +3332,7 @@ function eliminarSitio(id){
           }
         }
       })();
-      renderConsolidado();renderDashboard();
+      renderConsolidado();renderConsolidadoTSS();renderDashboard();
       logCambio('Eliminar Sitio', id, tieneLiqCW?(eliminarCW?'incluye CW':'CW conservada'):'');
       toast(`${id} eliminado${tieneLiqCW?(eliminarCW?' (con CW)':' — CW conservada'):''}`);
     };
@@ -3050,22 +3353,23 @@ function eliminarSitio(id){
 let _tssVis=[];
 function addTSSVisita(){
   const i=_tssVis.length;
-  _tssVis.push({tipo:'TSS_V',sitio:'',ciudad:'Ciudad_Secundaria',cant:1});
+  _tssVis.push({tipo:'TSS_VR',sitio:'',ciudad:'Ciudad_Principal',cant:1});
   const c=document.getElementById('tss-vis-cont');
   const d=document.createElement('div');
   d.style.cssText='background:var(--g1);border-radius:5px;padding:10px;margin-bottom:7px';
-  d.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1.5fr 1fr 80px auto;gap:6px;align-items:end">
-    <div><label class="fl">Tipo</label>
+  d.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1.5fr 1fr 70px auto;gap:6px;align-items:end">
+    <div><label class="fl">Tipo (Nokia)</label>
       <select class="fc" style="font-size:11px" onchange="_tssVis[${i}].tipo=this.value">
-        <option value="TSS_VR">TSS_VR (V+R)</option>
-        <option value="TSS_V" selected>TSS_V (Visita)</option>
+        <option value="TSS_VR" selected>TSS_VR (V+R)</option>
+        <option value="TSS_V">TSS_V (Visita)</option>
         <option value="TSS_R">TSS_R (Reporte)</option>
+        <option value="TSS_RD">TSS_RD (Rediseño)</option>
       </select></div>
     <div><label class="fl">Nombre sitio</label>
       <input type="text" class="fc" style="font-size:11px" placeholder="Ej: TOL.Espinal" oninput="_tssVis[${i}].sitio=this.value"></div>
     <div><label class="fl">Ciudad</label>
       <select class="fc" style="font-size:11px" onchange="_tssVis[${i}].ciudad=this.value">
-        ${ZONAS.map(z=>`<option value="${z}">${z.replace('Ciudad_','')}</option>`).join('')}
+        ${ZONAS.map(z=>`<option value="${z}" ${z==='Ciudad_Principal'?'selected':''}>${z.replace('Ciudad_','')}</option>`).join('')}
       </select></div>
     <div><label class="fl">Cant</label>
       <input type="number" class="iq" value="1" min="1" oninput="_tssVis[${i}].cant=parseInt(this.value)||1"></div>
@@ -3078,11 +3382,25 @@ function crearTSS(){
   const fecha=document.getElementById('tss-fecha').value;
   const lc=document.getElementById('tss-lc').value;
   if(!nom||!lc){toast('Nombre y LC requeridos','err');return}
-  if(!_tssVis.length){toast('Agrega al menos una visita','err');return}
+  if(!_tssVis.length){toast('Agrega al menos una actividad','err');return}
   const sub=SUBCS.find(s=>s.lc===lc);
+  // Nokia activities (shown in Nokia card)
+  const nokiaActs=_tssVis.map(v=>({sec:'TSS',tipo:'BASE',id:v.tipo,ciudad:v.ciudad,sitioid:v.sitio,cant:v.cant,catOver:'',cardType:'nokia'}));
+  // SUBC activities auto-derived per tipo
+  const subcActs=[];
+  _tssVis.forEach(v=>{
+    if(v.tipo==='TSS_V'||v.tipo==='TSS_VR')
+      subcActs.push({sec:'TSS',tipo:'BASE',id:'TSS_V',ciudad:v.ciudad,sitioid:v.sitio,cant:v.cant,catOver:'',cardType:'subc'});
+    if(v.tipo==='TSS_R'||v.tipo==='TSS_VR')
+      subcActs.push({sec:'TSS',tipo:'BASE',id:'TSS_R',ciudad:v.ciudad,sitioid:v.sitio,cant:v.cant,catOver:'',cardType:'subc'});
+    if(v.tipo==='TSS_RD')
+      subcActs.push({sec:'TSS',tipo:'BASE',id:'TSS_RD',ciudad:v.ciudad,sitioid:v.sitio,cant:v.cant,catOver:'',cardType:'subc'});
+  });
   ST.sitios.push({id:nom,nombre:nom,tipo:'TSS',fecha:fecha||hoy(),ciudad:'varios',lc,cat:sub?.cat||'A',
+    lcVisita:lc,lcReporte:lc,lcRedesign:'',
+    catOverVisita:'',catOverReporte:'',catOverRedesign:'',
     cw_nokia:0,cw_costo:0,tiene_cw:false,costos:{matTI:0,matCW:0},
-    actividades:_tssVis.map(v=>({sec:'TSS',tipo:'BASE',id:v.tipo,ciudad:v.ciudad,sitioid:v.sitio,cant:v.cant}))});
+    actividades:[...nokiaActs,...subcActs]});
   _tssVis=[];
   document.getElementById('tss-vis-cont').innerHTML='';
   saveState();
@@ -3119,13 +3437,27 @@ function renderGastos(){
   document.getElementById('tfoot-gastos').innerHTML=ST.gastos.length?`<tr class="tr-tot"><td colspan="3"><strong>TOTAL</strong></td><td class="num">${cop(tot)}</td><td></td></tr>`:'';
   ST.gastos=_orig;
 }
+function updGastoSubSitio(){
+  const id=document.getElementById('g-sitio').value;
+  const s=ST.sitios.find(x=>x.id===id);
+  const wrap=document.getElementById('g-sub-sitio-wrap');
+  if(!wrap)return;
+  if(s&&s.tipo==='TSS'){
+    const sitioids=[...new Set((s.actividades||[]).map(a=>a.sitioid).filter(Boolean))].sort();
+    document.getElementById('g-sub-sitio').innerHTML='<option value="">— General —</option>'+sitioids.map(si=>`<option value="${si}">${si}</option>`).join('');
+    wrap.style.display='';
+  } else {
+    wrap.style.display='none';
+  }
+}
 function agregarGasto(){
   const sitio=document.getElementById('g-sitio').value;
   const tipo=document.getElementById('g-tipo').value;
   const desc=document.getElementById('g-desc').value.trim();
   const valor=parseFloat(document.getElementById('g-valor').value)||0;
+  const sub_sitio=document.getElementById('g-sub-sitio')?.value||'';
   if(!sitio||!desc){toast('Completa todos los campos','err');return}
-  ST.gastos.push({sitio,tipo,desc,valor});
+  ST.gastos.push({sitio,tipo,desc,valor,sub_sitio});
   saveState();
   closeModal('m-gastos');
   document.getElementById('g-desc').value='';document.getElementById('g-valor').value='';
@@ -3169,6 +3501,7 @@ function guardarEditGasto(){
 }
 function openGastoFor(id){
   document.getElementById('g-sitio').innerHTML=ST.sitios.map(s=>`<option value="${s.id}" ${s.id===id?'selected':''}>${s.id}</option>`).join('');
+  updGastoSubSitio();
   openModal('m-gastos');
 }
 
@@ -4584,7 +4917,7 @@ function renderConsolidadoCW(){
   if(lcSel){
     const cur=lcSel.value;
     const lcs=[...new Set(ST.liquidaciones_cw.map(l=>l.lc).filter(Boolean))].sort();
-    lcSel.innerHTML='<option value="">Todas las Cuadrillas (LC)</option>'+lcs.map(l=>`<option value="${l}" ${l===cur?'selected':''}>${l}</option>`).join('');
+    lcSel.innerHTML='<option value="">Todos los LC</option>'+lcs.map(l=>`<option value="${l}" ${l===cur?'selected':''}>${l}</option>`).join('');
     if(cur)lcSel.value=cur;
   }
   const filtered=ST.liquidaciones_cw.filter(l=>{
